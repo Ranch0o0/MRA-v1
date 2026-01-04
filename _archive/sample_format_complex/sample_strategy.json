@@ -1,0 +1,7 @@
+{
+    "id": "strategy-1",
+    "content": "If a player says 'I am a knaive', then we can deduce that he must be a spy",
+    "explaination": "If he is telling the truth, then he is a knave but knave must lie, a contradiction. Hence he is lying. If he were a knave, he is actually telling the truth, a contradiction. Hence he must be a spy",
+    "stats": {},
+    "reliability": 1.0
+}

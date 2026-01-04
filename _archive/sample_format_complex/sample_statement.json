@@ -1,0 +1,9 @@
+{
+    "id": "statement-1",
+    "content": "Knight always tells the truth",
+    "source": "axiom",
+    "dependencies": [],
+    "determined_truthfulness": true,
+    "stats": {},
+    "reliability": 1.0
+}
