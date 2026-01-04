@@ -1,16 +1,16 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional, Any
 
 @dataclass
 class type_argument:
-    cot: list[str]
-    full: str
+    cot: list[str] = field(default_factory=list)
+    full: str = ""
 
 @dataclass
 class type_trigger:
-    phase: list[str]
-    agents: list[str]
-    situation: list[str]
+    phase: list[str] = field(default_factory=list)
+    agents: list[str] = field(default_factory=list)
+    situation: list[str] = field(default_factory=list)
 
 @dataclass
 class type_stats:
@@ -24,30 +24,29 @@ class type_statement:
     conclusion: str
 
     # With default values:
-    dependencies: list[str] = []
+    dependencies: list[str] = field(default_factory=list)
     status: str = "pending"
     reliability: float = 0.0
-    stats: type_stats = type_stats()
-    proof: type_argument = type_argument(cot=[], full="")
+    stats: type_stats = field(default_factory=type_stats)
+    proof: type_argument = field(default_factory=type_argument)
 
 @dataclass
 class type_experience:
     id: str
     content: str
-    
+
     # With default values:
     explanation: str = ""
-    trigger: type_trigger = type_trigger(phase=[], agents=[], situation=[])
-    stats: type_stats = type_stats()
+    trigger: type_trigger = field(default_factory=type_trigger)
+    stats: type_stats = field(default_factory=type_stats)
 
 @dataclass
 class type_problem:
     id: str
     hypothesis: list[str]
     objectives: list[str]
-    
+
     # With default values:
     status: str = "unresolved"
     motivation: str = ""
-    solution: type_argument = type_argument(cot=[], full="")
-    
+    solution: type_argument = field(default_factory=type_argument)
