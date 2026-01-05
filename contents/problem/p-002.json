@@ -1,0 +1,31 @@
+{
+    "id": "p-002",
+    "hypothesis": [
+        "Game rules: Knights always tell truth, Knaves always lie, Spies can either",
+        "Alice says: Among Violet, Quinn, Tina, and Bob, there is exactly one knight",
+        "David says: Among Xavier, Yara, Tina, Alice, Bob, Quinn, and I, there are exactly six knaves",
+        "Quinn says: Among Alice and David, exactly one person is lying",
+        "Bob says: Alice and I have the same role",
+        "Xavier says: Alice, Violet, Yara, Tina, Quinn, and David all have the same role",
+        "Violet says: Among Xavier, Tina, and I, the number of knights is even",
+        "Yara says: Among Violet, Quinn, Alice, Xavier, and Bob, the number of people who are telling the truth is odd",
+        "Tina says: Quinn, Yara, David, and I all have the same role",
+        "Hint: Among all players, there is exactly one spy"
+    ],
+    "objectives": [
+        "Determine the role of Alice",
+        "Determine the role of David",
+        "Determine the role of Quinn",
+        "Determine the role of Bob",
+        "Determine the role of Xavier",
+        "Determine the role of Violet",
+        "Determine the role of Yara",
+        "Determine the role of Tina"
+    ],
+    "status": "unresolved",
+    "motivation": "",
+    "solution": {
+        "cot": [],
+        "full": ""
+    }
+}
