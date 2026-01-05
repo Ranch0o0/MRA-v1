@@ -1,0 +1,15 @@
+{
+    "id": "p-003",
+    "hypothesis": [
+        "Test hypothesis"
+    ],
+    "objectives": [
+        "Test objective"
+    ],
+    "status": "unresolved",
+    "motivation": "",
+    "solution": {
+        "cot": [],
+        "full": ""
+    }
+}
