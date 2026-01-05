@@ -1,0 +1,18 @@
+{
+    "id": "s-010",
+    "type": "assumption",
+    "conclusion": [
+        "Violet says: Among Xavier, Tina, and I, the number of knights is even"
+    ],
+    "hypothesis": [],
+    "dependencies": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "proof": {
+        "cot": [],
+        "full": ""
+    }
+}
