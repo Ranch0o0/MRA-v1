@@ -20,10 +20,10 @@ class type_stats:
 class type_statement:
     id: str
     type: str
-    hypothesis: list[str]
-    conclusion: str
+    conclusion: list[str]
 
     # With default values:
+    hypothesis: list[str] = field(default_factory=list)
     dependencies: list[str] = field(default_factory=list)
     status: str = "pending"
     reliability: float = 0.0
