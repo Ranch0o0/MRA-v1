@@ -214,8 +214,13 @@ def _create_problem(
     solution_full: Optional[str],
     solution_ref: Optional[tuple[str, list[str]]],
     root_change: bool
-) -> str | tuple[str, list[type_object_change]]:
-    """Create a new problem."""
+) -> tuple[str, int] | tuple[str, list[type_object_change]]:
+    """Create a new problem.
+
+    Returns:
+        If root_change=True: Tuple of (problem_id, nested_statement_count)
+        If root_change=False: Tuple of (problem_id, list of type_object_change)
+    """
     # Validate required fields
     if objectives is None:
         raise ValueError("'objectives' is required for creating a problem.")
@@ -223,6 +228,7 @@ def _create_problem(
     # Collect all changes
     changes = []
     processed_hypothesis = []
+    nested_count = 0
 
     # Process hypothesis items if provided
     if hypothesis:
@@ -230,6 +236,7 @@ def _create_problem(
             formatted, new_changes = process_hypothesis_item(item)
             processed_hypothesis.append(formatted)
             changes.extend(new_changes)
+            nested_count += len(new_changes)
 
     # Generate problem ID
     id_manager = IDManager()
@@ -272,9 +279,38 @@ def _create_problem(
 
     if root_change:
         handle_changes(changes)
-        return problem_id
+        return (problem_id, nested_count)
     else:
         return (problem_id, changes)
+
+
+def _format_update_fields(updates: dict) -> str:
+    """Format update field names for output.
+
+    Groups nested fields (e.g., solution.cot, solution.full -> solution).
+    Shows up to 4 fields, then ... if more.
+
+    Args:
+        updates: Dict of field paths to values
+
+    Returns:
+        Formatted string like "[status,summary,solution]"
+    """
+    # Extract unique top-level field names
+    fields = set()
+    for key in updates.keys():
+        # Get top-level field (before first dot)
+        top_level = key.split(".")[0]
+        fields.add(top_level)
+
+    # Sort for consistent output
+    field_list = sorted(fields)
+
+    # Limit to 4 fields
+    if len(field_list) > 4:
+        return "[" + ",".join(field_list[:4]) + ",...]"
+    else:
+        return "[" + ",".join(field_list) + "]"
 
 
 def _update_problem(
@@ -290,8 +326,13 @@ def _update_problem(
     solution_full: Optional[str],
     solution_ref: Optional[tuple[str, list[str]]],
     root_change: bool
-) -> str | tuple[str, list[type_object_change]]:
-    """Update an existing problem."""
+) -> tuple[str, str] | tuple[str, list[type_object_change]]:
+    """Update an existing problem.
+
+    Returns:
+        If root_change=True: Tuple of (log_id, formatted_fields_string)
+        If root_change=False: Tuple of (id, list of type_object_change)
+    """
     # Validate ID
     validate_problem_id(id)
 
@@ -341,7 +382,8 @@ def _update_problem(
 
     if root_change:
         log_id, _, modified_ids = handle_changes([change])
-        return log_id
+        fields_str = _format_update_fields(updates)
+        return (log_id, fields_str)
     else:
         return (id, [change])
 
@@ -439,6 +481,13 @@ if __name__ == "__main__":
     result = handle_problem(**kwargs)
 
     if args.id is None:
-        print(f"Created problem: {result}")
+        # Create mode: result is (problem_id, nested_count)
+        problem_id, nested_count = result
+        if nested_count > 0:
+            print(f"Created problem: {problem_id} [+{nested_count} statements]")
+        else:
+            print(f"Created problem: {problem_id}")
     else:
-        print(f"Updated problem {args.id} (log: {result})")
+        # Update mode: result is (log_id, fields_str)
+        log_id, fields_str = result
+        print(f"Updated {args.id} {fields_str} (log: {log_id})")

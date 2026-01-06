@@ -1,11 +1,11 @@
 {
     "id": "s-004",
-    "type": "assumption",
+    "type": "normal",
     "conclusion": [
-        "Spy can either tell truth or lie"
+        "New hypothesis item"
     ],
     "hypothesis": [],
-    "status": "true",
+    "status": "pending",
     "reliability": 0.0,
     "stats": {
         "count_usage": 0

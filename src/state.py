@@ -152,6 +152,35 @@ def _create_statement(
         return (statement_id, [change])
 
 
+def _format_update_fields(updates: dict) -> str:
+    """Format update field names for output.
+
+    Groups nested fields (e.g., proof.cot, proof.full -> proof).
+    Shows up to 4 fields, then ... if more.
+
+    Args:
+        updates: Dict of field paths to values
+
+    Returns:
+        Formatted string like "[status,reliability,proof]"
+    """
+    # Extract unique top-level field names
+    fields = set()
+    for key in updates.keys():
+        # Get top-level field (before first dot)
+        top_level = key.split(".")[0]
+        fields.add(top_level)
+
+    # Sort for consistent output
+    field_list = sorted(fields)
+
+    # Limit to 4 fields
+    if len(field_list) > 4:
+        return "[" + ",".join(field_list[:4]) + ",...]"
+    else:
+        return "[" + ",".join(field_list) + "]"
+
+
 def _update_statement(
     id: str,
     type: Optional[str],
@@ -163,8 +192,13 @@ def _update_statement(
     proof_full: Optional[str],
     proof_ref: Optional[tuple[str, list[str]]],
     root_change: bool
-) -> str | tuple[str, list[type_object_change]]:
-    """Update an existing statement."""
+) -> tuple[str, str] | tuple[str, list[type_object_change]]:
+    """Update an existing statement.
+
+    Returns:
+        If root_change=True: Tuple of (log_id, formatted_fields_string)
+        If root_change=False: Tuple of (id, list of type_object_change)
+    """
     # Validate ID
     validate_statement_id(id)
 
@@ -212,7 +246,8 @@ def _update_statement(
 
     if root_change:
         log_id, _, modified_ids = handle_changes([change])
-        return log_id
+        fields_str = _format_update_fields(updates)
+        return (log_id, fields_str)
     else:
         return (id, [change])
 
@@ -299,6 +334,9 @@ if __name__ == "__main__":
     result = handle_statement(**kwargs)
 
     if args.id is None:
+        # Create mode: result is statement_id
         print(f"Created statement: {result}")
     else:
-        print(f"Updated statement {args.id} (log: {result})")
+        # Update mode: result is (log_id, fields_str)
+        log_id, fields_str = result
+        print(f"Updated {args.id} {fields_str} (log: {log_id})")

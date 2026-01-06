@@ -115,7 +115,7 @@ def create_initial_problem(
     hypothesis: list[str],
     objectives: list[str],
     root_change: bool = True
-) -> str | tuple[str, list[type_object_change]]:
+) -> tuple[str, int] | tuple[str, list[type_object_change]]:
     """Create the initial problem from a puzzle.
 
     This is the entry point for puzzle initialization.
@@ -127,18 +127,20 @@ def create_initial_problem(
         root_change: If True, commit to file and log; if False, return objects for parent
 
     Returns:
-        If root_change=True: The new problem ID
+        If root_change=True: Tuple of (problem_id, nested_statement_count)
         If root_change=False: Tuple of (problem_id, list of type_object_change)
     """
     # Collect all changes to be made
     changes = []
     processed_hypothesis = []
+    nested_count = 0
 
     # Process each hypothesis item
     for item in hypothesis:
         formatted, new_changes = process_hypothesis_item(item)
         processed_hypothesis.append(formatted)
         changes.extend(new_changes)
+        nested_count += len(new_changes)
 
     # Generate problem ID
     id_manager = IDManager()
@@ -160,7 +162,7 @@ def create_initial_problem(
     if root_change:
         # Commit all changes
         handle_changes(changes)
-        return problem_id
+        return (problem_id, nested_count)
     else:
         return (problem_id, changes)
 
@@ -174,5 +176,9 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    problem_id = create_initial_problem(args.hypothesis, args.objectives)
-    print(f"Created initial problem: {problem_id}")
+    problem_id, nested_count = create_initial_problem(args.hypothesis, args.objectives)
+
+    if nested_count > 0:
+        print(f"Created initial problem: {problem_id} [+{nested_count} statements]")
+    else:
+        print(f"Created initial problem: {problem_id}")

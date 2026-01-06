@@ -1,11 +1,12 @@
 {
-    "id": "p-002",
+    "id": "p-001",
     "hypothesis": [
         "(s-001) There are Knight, Knave, and Spy roles",
-        "(s-004) New hypothesis item"
+        "(s-002) Knight always tells the truth",
+        "(s-003) Knave always lies"
     ],
     "objectives": [
-        "Sub-objective 1"
+        "Determine the role of Alice"
     ],
     "status": "unresolved",
     "priority": "",

@@ -1,11 +1,11 @@
 {
-    "id": "s-008",
-    "type": "assumption",
+    "id": "s-005",
+    "type": "proposition",
     "conclusion": [
-        "Bob says: Alice and I have the same role"
+        "Test proposition"
     ],
     "hypothesis": [],
-    "status": "true",
+    "status": "pending",
     "reliability": 0.0,
     "stats": {
         "count_usage": 0
