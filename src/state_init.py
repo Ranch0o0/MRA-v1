@@ -4,7 +4,7 @@ import os
 from dataclasses import asdict
 
 from cus_types_main import type_statement
-from prob_utils import id_generation
+from utils import IDManager
 
 
 STATEMENT_FOLDER = "contents/statement"
@@ -29,7 +29,8 @@ def create_statement(
     if type not in VALID_TYPES:
         raise ValueError(f"Invalid type '{type}'. Expected one of: {VALID_TYPES}")
 
-    statement_id = id_generation("s")
+    id_manager = IDManager()
+    statement_id = id_manager.generate_id("s")
 
     # Use empty list if hypothesis is None
     hypothesis_list = hypothesis if hypothesis is not None else []

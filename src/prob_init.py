@@ -5,7 +5,7 @@ import re
 from dataclasses import asdict
 
 from cus_types_main import type_problem
-from prob_utils import id_generation
+from utils import IDManager
 from state_init import create_statement
 
 
@@ -145,7 +145,8 @@ def create_problem(hypothesis: list[str], objectives: list[str], initial: bool =
             created_statement_ids.append(id_match.group(1))
 
     # Generate problem ID
-    problem_id = id_generation("p")
+    id_manager = IDManager()
+    problem_id = id_manager.generate_id("p")
 
     # Create problem with processed hypothesis
     problem = type_problem(

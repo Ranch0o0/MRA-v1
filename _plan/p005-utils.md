@@ -200,3 +200,54 @@ This allows existing code to work without modifications if needed.
 - **Maintainability**: Encapsulated state management in clear class structure
 - **Type safety**: Instance variable provides clear interface for ID access
 - **Atomic updates**: Each `generate_id()` call persists immediately to prevent data loss
+
+---
+
+## Post-Implementation Simplification
+
+After initial implementation, the following simplification was made:
+
+### Simplified config.json Structure
+
+**Changed from**:
+```json
+{
+    "count_problems": "p-003",
+    "count_statements": "s-017",
+    "count_experiences": "e-000"
+}
+```
+
+**To**:
+```json
+{
+    "p": "p-003",
+    "s": "s-017",
+    "e": "e-000"
+}
+```
+
+**Rationale**: Using "p", "s", "e" directly as keys eliminates redundant mapping logic.
+
+### Code Simplifications in [src/utils.py](src/utils.py)
+
+1. **Removed redundant mappings**:
+   - Removed `TYPE_MAP` dict (was mapping "p" → "count_problems", etc.)
+   - Removed `TYPE_TO_INDEX` dict (was mapping "p" → 0, etc.)
+   - Replaced with simple `VALID_TYPES = ["p", "s", "e"]`
+
+2. **Changed internal storage**:
+   - Changed `_current_ids` from `list[str]` to `dict[str, str]`
+   - Direct access via `self._current_ids[type]` instead of index lookup
+   - Property `current_ids` now returns `dict[str, str]` instead of `list[str]`
+
+3. **Simplified `generate_id()` method**:
+   - Direct dictionary access: `self._current_ids[type]`
+   - Direct persistence: `json.dump(self._current_ids, f, indent=4)`
+   - No need to reconstruct config dict
+
+4. **Removed migration logic**:
+   - Removed integer-to-string migration code from `ensure_config()`
+   - Cleaner initialization
+
+**Result**: ~30 lines of code removed, clearer and more maintainable implementation.
