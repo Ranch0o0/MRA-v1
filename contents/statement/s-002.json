@@ -1,0 +1,18 @@
+{
+    "id": "s-002",
+    "type": "assumption",
+    "conclusion": [
+        "Knight always tells the truth"
+    ],
+    "hypothesis": [],
+    "dependencies": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "proof": {
+        "cot": [],
+        "full": ""
+    }
+}

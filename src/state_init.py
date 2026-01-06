@@ -1,10 +1,8 @@
 import argparse
-import json
-import os
 from dataclasses import asdict
 
 from cus_types_main import type_statement
-from utils import IDManager
+from utils import IDManager, commit_objects
 
 
 STATEMENT_FOLDER = "contents/statement"
@@ -14,17 +12,22 @@ VALID_TYPES = ["assumption", "proposition", "normal"]
 def create_statement(
     type: str,
     conclusion: list[str],
-    hypothesis: list[str] | None = None
-) -> str:
+    hypothesis: list[str] | None = None,
+    root_change: bool = True,
+    status: str = "pending"
+) -> str | tuple[str, dict]:
     """Create a new statement and save it to file.
 
     Args:
         type: Statement type, one of "assumption", "proposition", "normal"
         conclusion: List of conclusion strings
         hypothesis: Optional list of hypothesis strings
+        root_change: If True, commit to file and log; if False, return object for parent to handle
+        status: Initial status of the statement (default "pending")
 
     Returns:
-        The new statement ID
+        If root_change=True: The new statement ID
+        If root_change=False: Tuple of (object_type, object_data) for parent to commit
     """
     if type not in VALID_TYPES:
         raise ValueError(f"Invalid type '{type}'. Expected one of: {VALID_TYPES}")
@@ -39,16 +42,19 @@ def create_statement(
         id=statement_id,
         type=type,
         conclusion=conclusion,
-        hypothesis=hypothesis_list
+        hypothesis=hypothesis_list,
+        status=status
     )
 
-    os.makedirs(STATEMENT_FOLDER, exist_ok=True)
+    statement_data = asdict(statement)
 
-    statement_path = os.path.join(STATEMENT_FOLDER, f"{statement_id}.json")
-    with open(statement_path, "w") as f:
-        json.dump(asdict(statement), f, indent=4)
-
-    return statement_id
+    if root_change:
+        # Commit to file and create log entry
+        commit_objects([("s", statement_data)])
+        return statement_id
+    else:
+        # Return object for parent to handle
+        return ("s", statement_data)
 
 
 if __name__ == "__main__":

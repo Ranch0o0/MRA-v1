@@ -1,0 +1,18 @@
+{
+    "id": "s-001",
+    "type": "assumption",
+    "conclusion": [
+        "There are Knight, Knave, and Spy roles"
+    ],
+    "hypothesis": [],
+    "dependencies": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "proof": {
+        "cot": [],
+        "full": ""
+    }
+}

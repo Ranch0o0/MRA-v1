@@ -5,12 +5,11 @@ import re
 from dataclasses import asdict
 
 from cus_types_main import type_problem
-from utils import IDManager
+from utils import IDManager, commit_objects, OBJECT_FOLDERS
 from state_init import create_statement
 
 
-PROBLEM_FOLDER = "contents/problem"
-STATEMENT_FOLDER = "contents/statement"
+STATEMENT_FOLDER = OBJECT_FOLDERS["s"]  # Used by load_statement_conclusion()
 
 
 def parse_statement_id(text: str) -> str | None:
@@ -59,7 +58,7 @@ def load_statement_conclusion(statement_id: str) -> str | None:
         return None
 
 
-def process_hypothesis_item(item: str, initial: bool) -> str:
+def process_hypothesis_item(item: str, initial: bool) -> tuple[str, list[tuple[str, dict]]]:
     """Process single hypothesis item with smart ID handling.
 
     Args:
@@ -67,7 +66,7 @@ def process_hypothesis_item(item: str, initial: bool) -> str:
         initial: Whether this is an initial problem
 
     Returns:
-        Formatted hypothesis string with ID
+        Tuple of (formatted_hypothesis_string, list of objects to create)
     """
     # Check for existing statement ID
     statement_id = parse_statement_id(item)
@@ -76,7 +75,8 @@ def process_hypothesis_item(item: str, initial: bool) -> str:
         # Try to load the statement
         conclusion = load_statement_conclusion(statement_id)
         if conclusion:
-            return f"({statement_id}) {conclusion}"
+            # Existing statement found, no new objects to create
+            return (f"({statement_id}) {conclusion}", [])
 
         # ID format valid but file doesn't exist - strip invalid ID
         # Remove the "(id) " prefix
@@ -85,64 +85,49 @@ def process_hypothesis_item(item: str, initial: bool) -> str:
         # No ID pattern found, use original text
         cleaned_text = item.strip()
 
-    # Create new statement
+    # Create new statement with root_change=False to get object data
     statement_type = "assumption" if initial else "normal"
-    new_statement_id = create_statement(
+    # Set status='true' if initial, else 'pending' (born with correct status)
+    status = "true" if initial else "pending"
+
+    obj_type, obj_data = create_statement(
         type=statement_type,
         conclusion=[cleaned_text],
-        hypothesis=None
+        hypothesis=None,
+        root_change=False,
+        status=status
     )
 
-    return f"({new_statement_id}) {cleaned_text}"
+    return (f"({obj_data['id']}) {cleaned_text}", [(obj_type, obj_data)])
 
 
-def set_statement_status_true(statement_ids: list[str]):
-    """Mark statements as true.
-
-    Args:
-        statement_ids: List of statement IDs to update
-    """
-    for statement_id in statement_ids:
-        statement_path = os.path.join(STATEMENT_FOLDER, f"{statement_id}.json")
-
-        if not os.path.exists(statement_path):
-            continue
-
-        try:
-            with open(statement_path, 'r') as f:
-                statement_data = json.load(f)
-
-            statement_data['status'] = 'true'
-
-            with open(statement_path, 'w') as f:
-                json.dump(statement_data, f, indent=4)
-        except Exception as e:
-            print(f"Warning: Could not update status for {statement_id}: {e}")
-
-
-def create_problem(hypothesis: list[str], objectives: list[str], initial: bool = False) -> str:
+def create_problem(
+    hypothesis: list[str],
+    objectives: list[str],
+    initial: bool = False,
+    root_change: bool = True
+) -> str | tuple[str, list[tuple[str, dict]]]:
     """Create a new problem and save it to file.
 
     Args:
         hypothesis: List of hypothesis items
         objectives: List of objective items
-        initial: Whether this is an initial problem (auto-creates statements)
+        initial: Whether this is an initial problem (statements born with status='true')
+        root_change: If True, commit to file and log; if False, return objects for parent to handle
 
     Returns:
-        The new problem ID
+        If root_change=True: The new problem ID
+        If root_change=False: Tuple of (problem_id, list of objects to create)
     """
+    # Collect all objects to be created
+    objects_to_create = []
     processed_hypothesis = []
-    created_statement_ids = []
 
     # Process each hypothesis item
     for item in hypothesis:
-        processed_item = process_hypothesis_item(item, initial)
-        processed_hypothesis.append(processed_item)
-
-        # Extract ID from processed item for status update
-        id_match = re.match(r'^\(([se]-[a-z]*\d+)\)', processed_item)
-        if id_match:
-            created_statement_ids.append(id_match.group(1))
+        formatted, new_objects = process_hypothesis_item(item, initial)
+        processed_hypothesis.append(formatted)
+        objects_to_create.extend(new_objects)
 
     # Generate problem ID
     id_manager = IDManager()
@@ -155,17 +140,16 @@ def create_problem(hypothesis: list[str], objectives: list[str], initial: bool =
         objectives=objectives
     )
 
-    os.makedirs(PROBLEM_FOLDER, exist_ok=True)
+    problem_data = asdict(problem)
+    objects_to_create.append(("p", problem_data))
 
-    problem_path = os.path.join(PROBLEM_FOLDER, f"{problem_id}.json")
-    with open(problem_path, "w") as f:
-        json.dump(asdict(problem), f, indent=4)
-
-    # If initial, mark all statements as true
-    if initial:
-        set_statement_status_true(created_statement_ids)
-
-    return problem_id
+    if root_change:
+        # Commit all objects and create log
+        commit_objects(objects_to_create)
+        return problem_id
+    else:
+        # Return all objects for parent to handle
+        return (problem_id, objects_to_create)
 
 
 if __name__ == "__main__":
