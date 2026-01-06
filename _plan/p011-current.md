@@ -165,4 +165,63 @@ src/
 - Reuse constants from `utils.py`:
   - `PROJECT_ROOT`
   - `OBJECT_FOLDERS`
+  - `IDManager`
 - Standard library only: `os`, `json`, `glob`
+
+---
+
+## Implementation Notes (Post-Implementation)
+
+### Additional Feature: Edge Case Handling
+Added logic to handle two edge cases when no actionable problems or pending statements exist:
+
+**1. Puzzle Not Initialized** (`log_id == "l-000"`)
+```
+=== Status: Not Initialized ===
+
+The puzzle has not been initialized yet.
+Please run the initializer agent or use prob_init.py to start.
+```
+
+**2. Puzzle Solved** (`log_id > "l-000"` but no pending work)
+```
+=== Status: Puzzle Solved ===
+
+All problems have been resolved and all statements have been proved.
+The puzzle solution should be available in the resolved problem(s).
+```
+
+### Added Function
+```python
+def is_puzzle_initialized() -> bool:
+    """Check if the puzzle has been initialized.
+
+    Returns True if log ID > l-000 (meaning at least one operation has been logged).
+    """
+    id_manager = IDManager()
+    current_log_id = id_manager.current_ids.get("l", "l-000")
+    return current_log_id != "l-000"
+```
+
+### Updated Main Function Logic
+```python
+def show_current_status() -> None:
+    # ... load and filter ...
+
+    # Check for edge case: no actionable items
+    if not actionable_problems and not pending_statements:
+        if not is_puzzle_initialized():
+            # No logs yet - puzzle hasn't been initialized
+            print("=== Status: Not Initialized ===")
+            ...
+        else:
+            # Logs exist but no pending work - puzzle is solved
+            print("=== Status: Puzzle Solved ===")
+            ...
+        return
+
+    # Normal case: display actionable items
+    ...
+```
+
+### Status: COMPLETED
