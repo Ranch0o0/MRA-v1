@@ -1,15 +1,21 @@
+"""Initialize problem from puzzle.
+
+This script is only used for the initial problem creation from a puzzle.
+All hypothesis items are treated as assumptions with status='true'.
+
+For creating subsequent problems or updating problems, use prob.py instead.
+"""
 import argparse
 import json
 import os
 import re
 from dataclasses import asdict
 
-from cus_types_main import type_problem
-from utils import IDManager, commit_objects, OBJECT_FOLDERS
-from state_init import create_statement
+from cus_types_main import type_problem, type_statement, type_object_change
+from utils import IDManager, handle_changes, OBJECT_FOLDERS
 
 
-STATEMENT_FOLDER = OBJECT_FOLDERS["s"]  # Used by load_statement_conclusion()
+STATEMENT_FOLDER = OBJECT_FOLDERS["s"]
 
 
 def parse_statement_id(text: str) -> str | None:
@@ -58,15 +64,16 @@ def load_statement_conclusion(statement_id: str) -> str | None:
         return None
 
 
-def process_hypothesis_item(item: str, initial: bool) -> tuple[str, list[tuple[str, dict]]]:
-    """Process single hypothesis item with smart ID handling.
+def process_hypothesis_item(item: str) -> tuple[str, list[type_object_change]]:
+    """Process single hypothesis item for initial problem.
+
+    All new statements are created as assumptions with status='true'.
 
     Args:
         item: Hypothesis item text
-        initial: Whether this is an initial problem
 
     Returns:
-        Tuple of (formatted_hypothesis_string, list of objects to create)
+        Tuple of (formatted_hypothesis_string, list of type_object_change)
     """
     # Check for existing statement ID
     statement_id = parse_statement_id(item)
@@ -79,55 +86,59 @@ def process_hypothesis_item(item: str, initial: bool) -> tuple[str, list[tuple[s
             return (f"({statement_id}) {conclusion}", [])
 
         # ID format valid but file doesn't exist - strip invalid ID
-        # Remove the "(id) " prefix
         cleaned_text = re.sub(r'^\([se]-[a-z]*\d+\)\s*', '', item.lstrip()).strip()
     else:
         # No ID pattern found, use original text
         cleaned_text = item.strip()
 
-    # Create new statement with root_change=False to get object data
-    statement_type = "assumption" if initial else "normal"
-    # Set status='true' if initial, else 'pending' (born with correct status)
-    status = "true" if initial else "pending"
+    # Generate new statement ID
+    id_manager = IDManager()
+    new_statement_id = id_manager.generate_id("s")
 
-    obj_type, obj_data = create_statement(
-        type=statement_type,
+    # Create new statement as assumption with status='true'
+    statement = type_statement(
+        id=new_statement_id,
+        type="assumption",
         conclusion=[cleaned_text],
-        hypothesis=None,
-        root_change=False,
-        status=status
+        status="true"
     )
 
-    return (f"({obj_data['id']}) {cleaned_text}", [(obj_type, obj_data)])
+    change = type_object_change(
+        change_type="create",
+        obj=statement
+    )
+
+    return (f"({new_statement_id}) {cleaned_text}", [change])
 
 
-def create_problem(
+def create_initial_problem(
     hypothesis: list[str],
     objectives: list[str],
-    initial: bool = False,
     root_change: bool = True
-) -> str | tuple[str, list[tuple[str, dict]]]:
-    """Create a new problem and save it to file.
+) -> str | tuple[str, list[type_object_change]]:
+    """Create the initial problem from a puzzle.
+
+    This is the entry point for puzzle initialization.
+    All hypothesis items are treated as assumptions (status='true').
 
     Args:
         hypothesis: List of hypothesis items
         objectives: List of objective items
-        initial: Whether this is an initial problem (statements born with status='true')
-        root_change: If True, commit to file and log; if False, return objects for parent to handle
+        root_change: If True, commit to file and log; if False, return objects for parent
 
     Returns:
         If root_change=True: The new problem ID
-        If root_change=False: Tuple of (problem_id, list of objects to create)
+        If root_change=False: Tuple of (problem_id, list of type_object_change)
     """
-    # Collect all objects to be created
-    objects_to_create = []
+    # Collect all changes to be made
+    changes = []
     processed_hypothesis = []
 
     # Process each hypothesis item
     for item in hypothesis:
-        formatted, new_objects = process_hypothesis_item(item, initial)
+        formatted, new_changes = process_hypothesis_item(item)
         processed_hypothesis.append(formatted)
-        objects_to_create.extend(new_objects)
+        changes.extend(new_changes)
 
     # Generate problem ID
     id_manager = IDManager()
@@ -140,25 +151,28 @@ def create_problem(
         objectives=objectives
     )
 
-    problem_data = asdict(problem)
-    objects_to_create.append(("p", problem_data))
+    problem_change = type_object_change(
+        change_type="create",
+        obj=problem
+    )
+    changes.append(problem_change)
 
     if root_change:
-        # Commit all objects and create log
-        commit_objects(objects_to_create)
+        # Commit all changes
+        handle_changes(changes)
         return problem_id
     else:
-        # Return all objects for parent to handle
-        return (problem_id, objects_to_create)
+        return (problem_id, changes)
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Initialize a new problem")
-    parser.add_argument('--hypothesis', nargs='+', type=str, required=True)
-    parser.add_argument('--objectives', nargs='+', type=str, required=True)
-    parser.add_argument('--initial', action='store_true', default=False)
+    parser = argparse.ArgumentParser(description="Initialize problem from puzzle")
+    parser.add_argument('--hypothesis', nargs='+', type=str, required=True,
+                        help='List of hypothesis items')
+    parser.add_argument('--objectives', nargs='+', type=str, required=True,
+                        help='List of objective items')
 
     args = parser.parse_args()
 
-    problem_id = create_problem(args.hypothesis, args.objectives, args.initial)
-    print(f"Created problem: {problem_id}")
+    problem_id = create_initial_problem(args.hypothesis, args.objectives)
+    print(f"Created initial problem: {problem_id}")

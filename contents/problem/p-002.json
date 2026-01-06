@@ -1,0 +1,37 @@
+{
+    "id": "p-002",
+    "hypothesis": [
+        "(s-009) Xavier says: Alice, Violet, Yara, Tina, Quinn, and David all have the same role",
+        "(s-013) Hint: Among all players, there is exactly one spy"
+    ],
+    "objectives": [
+        "Determine if Xavier's statement (that all 6 named players have the same role) can be true",
+        "If Xavier's statement is false, determine Xavier's role"
+    ],
+    "status": "resolved",
+    "priority": "",
+    "summary": "Proved that Xavier is a Knave by contradiction",
+    "progresses": [
+        "Analyzed Xavier's claim that 6 players share the same role",
+        "Combined with hint about exactly 1 spy",
+        "Concluded Xavier's statement must be false",
+        "Determined Xavier is a Knave"
+    ],
+    "preliminaries": [],
+    "solution": {
+        "cot": [
+            "Xavier says 6 specific players all have the same role",
+            "There is exactly 1 spy total",
+            "If 6 had same role, must be all Knights or all Knaves",
+            "All 6 Knights: leaves Bob, Xavier, and 1 of {Yara} to have Knave+Spy - impossible constraint",
+            "All 6 Knaves: means 6 liars which contradicts having consistent statements",
+            "Therefore Xavier lies, so Xavier = Knave"
+        ],
+        "full": "Xavier is a Knave. His statement that Alice, Violet, Yara, Tina, Quinn, and David all share the same role is false. This is proven by combining the constraint that there is exactly 1 spy with the logical impossibility of 6 players sharing a single role.",
+        "ref": [
+            "(s-014)",
+            "(s-009)",
+            "(s-013)"
+        ]
+    }
+}

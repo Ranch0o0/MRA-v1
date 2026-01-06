@@ -1,0 +1,21 @@
+{
+    "id": "p-003",
+    "hypothesis": [
+        "(s-005) Alice says: Among Violet, Quinn, Tina, and Bob, there is exactly one knight",
+        "(s-010) Violet says: Among Xavier, Tina, and I, the number of knights is even"
+    ],
+    "objectives": [
+        "Analyze the relationship between Alice's and Violet's statements",
+        "Determine possible role combinations for Alice and Violet"
+    ],
+    "status": "unresolved",
+    "priority": "",
+    "summary": "",
+    "progresses": [],
+    "preliminaries": [],
+    "solution": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    }
+}

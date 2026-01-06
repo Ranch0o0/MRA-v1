@@ -474,3 +474,108 @@ def update_objects(updates_list: list[tuple[str, dict]]) -> tuple[str, list[str]
         f.write(json.dumps(log_entry) + "\n")
 
     return log_id, modified_ids
+
+
+def handle_changes(tasks: list) -> tuple[str, list[str], list[str]]:
+    """Unified function to handle both creation and update of objects.
+
+    IMPORTANT: This is the primary function for all object mutations.
+    It handles both creations and updates in a single atomic operation.
+
+    Args:
+        tasks: List of type_object_change objects, each containing:
+            - change_type: "create" or "update"
+            - obj: The object (type_problem or type_statement)
+            - updates: For update operations, the updates dict (optional)
+
+    Returns:
+        Tuple of (log_id, list of created IDs, list of modified IDs)
+
+    Process:
+        1. Generate log_id
+        2. For updates: create backup folder and backup files
+        3. Process each task:
+           - "create": write new object file
+           - "update": load, apply updates, write back
+        4. Write log entry with both created and modified IDs
+    """
+    from dataclasses import asdict
+    from cus_types_main import type_object_change
+
+    if not tasks:
+        raise ValueError("Cannot handle empty task list")
+
+    # Separate tasks by type
+    create_tasks = [t for t in tasks if t.change_type == "create"]
+    update_tasks = [t for t in tasks if t.change_type == "update"]
+
+    # Generate log ID first (needed for backup folder if there are updates)
+    id_manager = IDManager()
+    log_id = id_manager.generate_id("l")
+
+    created_ids = []
+    modified_ids = []
+
+    # Handle creations
+    for task in create_tasks:
+        obj_data = asdict(task.obj)
+        obj_id = obj_data["id"]
+        obj_type = get_object_type_from_id(obj_id)
+
+        if obj_type not in OBJECT_FOLDERS:
+            raise ValueError(f"Invalid object type '{obj_type}'. Expected one of: {list(OBJECT_FOLDERS.keys())}")
+
+        folder = OBJECT_FOLDERS[obj_type]
+        os.makedirs(folder, exist_ok=True)
+
+        file_path = os.path.join(folder, f"{obj_id}.json")
+        with open(file_path, "w") as f:
+            json.dump(obj_data, f, indent=4)
+
+        created_ids.append(obj_id)
+
+    # Handle updates (with backup)
+    if update_tasks:
+        backup_folder = os.path.join(HISTORY_FOLDER, log_id)
+        os.makedirs(backup_folder, exist_ok=True)
+
+        for task in update_tasks:
+            obj_id = task.obj.id if hasattr(task.obj, 'id') else task.obj["id"]
+            obj_type = get_object_type_from_id(obj_id)
+
+            # Load current object
+            obj_data = load_object(obj_id)
+
+            # Backup old version to history folder
+            backup_path = os.path.join(backup_folder, f"{obj_id}.json")
+            with open(backup_path, "w") as f:
+                json.dump(obj_data, f, indent=4)
+
+            # Apply updates
+            if task.updates:
+                updated_data = apply_updates(obj_data, task.updates)
+            else:
+                updated_data = obj_data
+
+            # Write updated object back to original location
+            folder = OBJECT_FOLDERS[obj_type]
+            file_path = os.path.join(folder, f"{obj_id}.json")
+            with open(file_path, "w") as f:
+                json.dump(updated_data, f, indent=4)
+
+            modified_ids.append(obj_id)
+
+    # Write log entry
+    log_manager = LogManager()
+    current_ids = id_manager.current_ids
+    log_entry = {
+        log_id: {
+            "creation": created_ids,
+            "modification": modified_ids
+        },
+        "current": [current_ids["p"], current_ids["s"], current_ids["e"]]
+    }
+    with open(log_manager.LOG_PATH, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
+    return log_id, created_ids, modified_ids

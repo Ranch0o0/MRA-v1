@@ -1,0 +1,18 @@
+{
+    "id": "s-005",
+    "type": "assumption",
+    "conclusion": [
+        "Alice says: Among Violet, Quinn, Tina, and Bob, there is exactly one knight"
+    ],
+    "hypothesis": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "proof": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    }
+}

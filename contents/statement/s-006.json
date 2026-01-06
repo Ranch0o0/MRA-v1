@@ -1,0 +1,18 @@
+{
+    "id": "s-006",
+    "type": "assumption",
+    "conclusion": [
+        "David says: Among Xavier, Yara, Tina, Alice, Bob, Quinn, and I, there are exactly six knaves"
+    ],
+    "hypothesis": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "proof": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    }
+}

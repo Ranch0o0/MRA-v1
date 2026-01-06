@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
-from typing import Optional, Any
+from typing import Optional, Any, Union
 
 @dataclass
 class type_argument:
     cot: list[str] = field(default_factory=list)
     full: str = ""
-    reference: list[str] = field(default_factory=list)
+    ref: list[str] = field(default_factory=list)  # renamed from 'reference'
 
 @dataclass
 class type_trigger:
@@ -53,3 +53,11 @@ class type_problem:
     progresses: list[str] = field(default_factory=list)
     preliminaries: list[str] = field(default_factory=list)
     solution: type_argument = field(default_factory=type_argument)
+
+
+@dataclass
+class type_object_change:
+    """Represents a change operation (create or update) for an object."""
+    change_type: str  # "create" or "update"
+    obj: Union[type_problem, type_statement]  # the object to be changed
+    updates: Optional[dict] = None  # for update operations, the updates dict

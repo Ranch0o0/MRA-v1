@@ -1,0 +1,18 @@
+{
+    "id": "s-014",
+    "type": "proposition",
+    "conclusion": [
+        "Xavier must be a Knave because if 6 players had the same role, and there is only 1 spy, those 6 would all be Knights or all be Knaves, which contradicts the hint"
+    ],
+    "hypothesis": [],
+    "status": "pending",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "proof": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    }
+}

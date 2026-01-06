@@ -1,0 +1,21 @@
+{
+    "id": "p-002",
+    "hypothesis": [
+        "(s-009) Xavier says: Alice, Violet, Yara, Tina, Quinn, and David all have the same role",
+        "(s-013) Hint: Among all players, there is exactly one spy"
+    ],
+    "objectives": [
+        "Determine if Xavier's statement (that all 6 named players have the same role) can be true",
+        "If Xavier's statement is false, determine Xavier's role"
+    ],
+    "status": "unresolved",
+    "priority": "",
+    "summary": "",
+    "progresses": [],
+    "preliminaries": [],
+    "solution": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    }
+}
