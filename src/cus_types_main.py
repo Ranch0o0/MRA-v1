@@ -5,6 +5,7 @@ from typing import Optional, Any
 class type_argument:
     cot: list[str] = field(default_factory=list)
     full: str = ""
+    reference: list[str] = field(default_factory=list)
 
 @dataclass
 class type_trigger:
@@ -24,7 +25,6 @@ class type_statement:
 
     # With default values:
     hypothesis: list[str] = field(default_factory=list)
-    dependencies: list[str] = field(default_factory=list)
     status: str = "pending"
     reliability: float = 0.0
     stats: type_stats = field(default_factory=type_stats)
@@ -48,7 +48,8 @@ class type_problem:
 
     # With default values:
     status: str = "unresolved"
-    motivation: str = ""
     priority: str = ""
-    preliminary: list[str] = field(default_factory=list)
+    summary: str =""
+    progresses: list[str] = field(default_factory=list)
+    preliminaries: list[str] = field(default_factory=list)
     solution: type_argument = field(default_factory=type_argument)

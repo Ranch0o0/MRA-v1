@@ -1,9 +1,0 @@
-{
-    "id": "experience-1",
-    "trigger": {
-        "stage": "problem_solving",
-        "agent": ["reasoner", "validator"],
-        "situation": "when arguing the role of a player"
-    },
-    "content": "Spy can either tell the truth or lie, so cannot simply deduce the role from the truthfulness of his statement"
-}
