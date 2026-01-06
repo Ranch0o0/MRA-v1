@@ -15,6 +15,8 @@ OBJECT_FOLDERS = {
     "e": os.path.join(PROJECT_ROOT, "contents/experience")
 }
 
+HISTORY_FOLDER = os.path.join(PROJECT_ROOT, "contents/history")
+
 
 def ensure_config() -> dict:
     """Ensure config file exists and return its contents."""
@@ -246,12 +248,14 @@ class LogManager:
         id_manager = IDManager()
         log_id = id_manager.generate_id("l")
 
-        # Build log entry
+        # Build log entry with current indices (p, s, e only)
+        current_ids = id_manager.current_ids
         log_entry = {
             log_id: {
                 "creation": created_ids,
                 "modification": modified_ids if modified_ids else []
-            }
+            },
+            "current": [current_ids["p"], current_ids["s"], current_ids["e"]]
         }
 
         # Append to JSONL file
@@ -302,3 +306,171 @@ def commit_objects(objects: list[tuple[str, dict]]) -> tuple[str, list[str]]:
     log_id = log_manager.log_changes(created_ids=created_ids)
 
     return log_id, created_ids
+
+
+def get_object_type_from_id(obj_id: str) -> str:
+    """Extract object type from ID prefix.
+
+    Args:
+        obj_id: Object ID (e.g., "s-001", "p-001")
+
+    Returns:
+        Object type: "p", "s", or "e"
+
+    Raises:
+        ValueError: If ID format is invalid
+    """
+    if "-" not in obj_id:
+        raise ValueError(f"Invalid object ID format: {obj_id}")
+    return obj_id.split("-")[0]
+
+
+def load_object(obj_id: str) -> dict:
+    """Load an object from file by ID.
+
+    Args:
+        obj_id: Object ID (e.g., "s-001", "p-001")
+
+    Returns:
+        Object data as dict
+
+    Raises:
+        FileNotFoundError: If object file doesn't exist
+        ValueError: If object type is invalid
+    """
+    obj_type = get_object_type_from_id(obj_id)
+
+    if obj_type not in OBJECT_FOLDERS:
+        raise ValueError(f"Invalid object type '{obj_type}'. Expected one of: {list(OBJECT_FOLDERS.keys())}")
+
+    folder = OBJECT_FOLDERS[obj_type]
+    file_path = os.path.join(folder, f"{obj_id}.json")
+
+    if not os.path.exists(file_path):
+        raise FileNotFoundError(f"Object file not found: {file_path}")
+
+    with open(file_path, "r") as f:
+        return json.load(f)
+
+
+def apply_updates(obj_data: dict, updates: dict) -> dict:
+    """Apply updates to an object, handling nested fields and list modes.
+
+    Args:
+        obj_data: Current object data
+        updates: Dict of field paths to new values
+                 For list fields: value is tuple (mode, values) where mode is 'overwrite' or 'append'
+                 For single fields: value is the new value
+
+    Returns:
+        Updated object data (modified in place)
+
+    Supports dot notation for nested fields:
+        - "solution.cot" -> obj_data["solution"]["cot"]
+        - "proof.full" -> obj_data["proof"]["full"]
+    """
+    for field_path, value in updates.items():
+        # Navigate to the nested field
+        parts = field_path.split(".")
+        target = obj_data
+
+        # Navigate to parent of the target field
+        for part in parts[:-1]:
+            if part not in target:
+                target[part] = {}
+            target = target[part]
+
+        final_key = parts[-1]
+
+        # Check if this is a list update with mode
+        if isinstance(value, tuple) and len(value) == 2:
+            mode, values = value
+            mode = mode.lower()  # Case-insensitive
+
+            if mode == "overwrite":
+                target[final_key] = list(values)
+            elif mode == "append":
+                if final_key not in target:
+                    target[final_key] = []
+                target[final_key].extend(values)
+            else:
+                raise ValueError(f"Invalid mode '{mode}'. Expected 'overwrite' or 'append'")
+        else:
+            # Single value update
+            target[final_key] = value
+
+    return obj_data
+
+
+def update_objects(updates_list: list[tuple[str, dict]]) -> tuple[str, list[str]]:
+    """Update objects and log the changes with version backup.
+
+    IMPORTANT: This is the ONLY function that should modify existing object files.
+    All update_xxx() functions should collect updates and delegate to this
+    function to ensure log and file changes are always in sync.
+
+    Args:
+        updates_list: List of (obj_id, updates_dict) tuples
+                      updates_dict maps field paths to new values
+
+    Returns:
+        Tuple of (log_id, list of modified object IDs)
+
+    Process:
+        1. Generate log_id
+        2. Create backup folder: contents/history/{log_id}/
+        3. For each object:
+           a. Load current object
+           b. Copy to backup folder
+           c. Apply updates
+           d. Write updated object back
+        4. Write log entry
+    """
+    if not updates_list:
+        raise ValueError("Cannot update with empty updates list")
+
+    # Generate log ID first (needed for backup folder)
+    id_manager = IDManager()
+    log_id = id_manager.generate_id("l")
+
+    # Create backup folder
+    backup_folder = os.path.join(HISTORY_FOLDER, log_id)
+    os.makedirs(backup_folder, exist_ok=True)
+
+    modified_ids = []
+
+    for obj_id, updates in updates_list:
+        # Load current object
+        obj_data = load_object(obj_id)
+        obj_type = get_object_type_from_id(obj_id)
+
+        # Backup old version to history folder
+        backup_path = os.path.join(backup_folder, f"{obj_id}.json")
+        with open(backup_path, "w") as f:
+            json.dump(obj_data, f, indent=4)
+
+        # Apply updates
+        updated_data = apply_updates(obj_data, updates)
+
+        # Write updated object back to original location
+        folder = OBJECT_FOLDERS[obj_type]
+        file_path = os.path.join(folder, f"{obj_id}.json")
+        with open(file_path, "w") as f:
+            json.dump(updated_data, f, indent=4)
+
+        modified_ids.append(obj_id)
+
+    # Write log entry with current indices (p, s, e only)
+    log_manager = LogManager()
+    current_ids = id_manager.current_ids
+    log_entry = {
+        log_id: {
+            "creation": [],
+            "modification": modified_ids
+        },
+        "current": [current_ids["p"], current_ids["s"], current_ids["e"]]
+    }
+    with open(log_manager.LOG_PATH, "a") as f:
+        f.write(json.dumps(log_entry) + "\n")
+
+    return log_id, modified_ids

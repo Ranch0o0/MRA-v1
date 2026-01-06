@@ -54,7 +54,9 @@ For the params that can be added via terminal arguments, I am expecting two type
 3. `src/utils.py`
 - Create a new function to handle object updates.
 - To manage the history:
-    - In `contents/history/log.jsonl`, only record the list of changed object ids.
+    - In `contents/history/log.jsonl`, record the list of changed object ids AND current indices.
+    - Each log entry includes a `"current"` field with compact format: `[p-XXX, s-XXX, e-XXX]` (no log index).
+    - Example: `{"l-002": {"creation": [], "modification": ["s-001"]}, "current": ["p-001", "s-013", "e-000"]}`
     - If the update list is non-empty
         - Create a folder `contents/history/{{log_id}}/`
         - Copy ALL the objects that will be updated into this folder.
@@ -143,7 +145,7 @@ def update_objects(updates_list: list[tuple[str, dict]]) -> tuple[str, list[str]
            b. Copy to backup folder
            c. Apply updates
            d. Write updated object back
-        4. Write log entry
+        4. Write log entry with "current" field containing [p, s, e] indices
     """
 ```
 
@@ -282,13 +284,19 @@ When updating objects, the backup folder structure will be:
 ```
 contents/
 └── history/
-    ├── log.jsonl              # Log entries
+    ├── log.jsonl              # Log entries with "current" field
     ├── l-002/                  # Backup folder for log l-002
     │   ├── s-001.json         # Old version of s-001 before update
     │   └── p-001.json         # Old version of p-001 before update
     └── l-003/
         └── s-005.json
 ```
+
+**Log entry format:**
+```json
+{"l-002": {"creation": [], "modification": ["s-001"]}, "current": ["p-001", "s-013", "e-000"]}
+```
+- The `"current"` field tracks the indices after the operation (p, s, e only - no log index)
 
 ### File Changes Summary
 

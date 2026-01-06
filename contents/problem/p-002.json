@@ -1,0 +1,19 @@
+{
+    "id": "p-002",
+    "hypothesis": [
+        "(s-005) Alice says: Among Violet, Quinn, Tina, and Bob, there is exactly one knight",
+        "(s-010) Violet says: Among Xavier, Tina, and I, the number of knights is even"
+    ],
+    "objectives": [
+        "Determine if Xavier's statement (that all 6 named players have the same role) can be true",
+        "If Xavier's statement is false, determine Xavier's role"
+    ],
+    "status": "unresolved",
+    "motivation": "",
+    "priority": "",
+    "preliminary": [],
+    "solution": {
+        "cot": [],
+        "full": ""
+    }
+}
