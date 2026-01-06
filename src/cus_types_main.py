@@ -49,4 +49,6 @@ class type_problem:
     # With default values:
     status: str = "unresolved"
     motivation: str = ""
+    priority: str = ""
+    preliminary: list[str] = field(default_factory=list)
     solution: type_argument = field(default_factory=type_argument)
