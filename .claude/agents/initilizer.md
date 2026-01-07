@@ -45,6 +45,9 @@ venv-python src/prob_init.py --hypothesis "item1" "item2" ... --objectives "obje
 venv-python src/prob_init.py --hypothesis "I have three apples" "My sister has two more apples than I" --objectives "Determine the total number of apples both of us have"
 ```
 
+## Step 4. Report
+Please make a clear and concise report to the orchestrator of what you have done or what error you have encountered.
+
 # Principles for Parsing
 
 ## Hypothesis Parsing

@@ -8,6 +8,11 @@ class type_argument:
     ref: list[str] = field(default_factory=list)  # renamed from 'reference'
 
 @dataclass
+class type_validation:
+    issues: list[str] = field(default_factory=list)
+    responses: list[str] = field(default_factory=list)
+
+@dataclass
 class type_trigger:
     phase: list[str] = field(default_factory=list)
     agents: list[str] = field(default_factory=list)
@@ -25,10 +30,12 @@ class type_statement:
 
     # With default values:
     hypothesis: list[str] = field(default_factory=list)
+    preliminaries: list[str]
     status: str = "pending"
     reliability: float = 0.0
     stats: type_stats = field(default_factory=type_stats)
     proof: type_argument = field(default_factory=type_argument)
+    validation: type_validation = field(default_factory=type_validation)
 
 @dataclass
 class type_experience:
