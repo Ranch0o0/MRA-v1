@@ -42,6 +42,9 @@ def handle_statement(
     proof_cot: Optional[tuple[str, list[str]]] = None,
     proof_full: Optional[str] = None,
     proof_ref: Optional[tuple[str, list[str]]] = None,
+    preliminaries: Optional[tuple[str, list[str]]] = None,
+    validation_issues: Optional[tuple[str, list[str]]] = None,
+    validation_responses: Optional[tuple[str, list[str]]] = None,
     root_change: bool = True
 ) -> str | tuple[str, list[type_object_change]]:
     """Handle statement creation or update.
@@ -56,6 +59,9 @@ def handle_statement(
         proof_cot: Chain-of-thought for proof (mode, values)
         proof_full: Full proof text
         proof_ref: Proof references (mode, values)
+        preliminaries: Preliminary statement IDs (mode, values)
+        validation_issues: Validation issues (mode, values)
+        validation_responses: Validation responses (mode, values)
         root_change: If True, commit changes; if False, return changes for parent
 
     Returns:
@@ -73,6 +79,9 @@ def handle_statement(
             proof_cot=proof_cot,
             proof_full=proof_full,
             proof_ref=proof_ref,
+            preliminaries=preliminaries,
+            validation_issues=validation_issues,
+            validation_responses=validation_responses,
             root_change=root_change
         )
     else:
@@ -87,6 +96,9 @@ def handle_statement(
             proof_cot=proof_cot,
             proof_full=proof_full,
             proof_ref=proof_ref,
+            preliminaries=preliminaries,
+            validation_issues=validation_issues,
+            validation_responses=validation_responses,
             root_change=root_change
         )
 
@@ -100,6 +112,9 @@ def _create_statement(
     proof_cot: Optional[tuple[str, list[str]]],
     proof_full: Optional[str],
     proof_ref: Optional[tuple[str, list[str]]],
+    preliminaries: Optional[tuple[str, list[str]]],
+    validation_issues: Optional[tuple[str, list[str]]],
+    validation_responses: Optional[tuple[str, list[str]]],
     root_change: bool
 ) -> str | tuple[str, list[type_object_change]]:
     """Create a new statement."""
@@ -138,6 +153,19 @@ def _create_statement(
     if proof_ref is not None:
         _, values = proof_ref
         statement.proof.ref = list(values)
+
+    # Handle preliminaries if provided
+    if preliminaries is not None:
+        _, values = preliminaries
+        statement.preliminaries = list(values)
+
+    # Handle validation fields if provided
+    if validation_issues is not None:
+        _, values = validation_issues
+        statement.validation.issues = list(values)
+    if validation_responses is not None:
+        _, values = validation_responses
+        statement.validation.responses = list(values)
 
     # Create change object
     change = type_object_change(
@@ -191,6 +219,9 @@ def _update_statement(
     proof_cot: Optional[tuple[str, list[str]]],
     proof_full: Optional[str],
     proof_ref: Optional[tuple[str, list[str]]],
+    preliminaries: Optional[tuple[str, list[str]]],
+    validation_issues: Optional[tuple[str, list[str]]],
+    validation_responses: Optional[tuple[str, list[str]]],
     root_change: bool
 ) -> tuple[str, str] | tuple[str, list[type_object_change]]:
     """Update an existing statement.
@@ -223,6 +254,12 @@ def _update_statement(
         updates["proof.full"] = proof_full
     if proof_ref is not None:
         updates["proof.ref"] = proof_ref
+    if preliminaries is not None:
+        updates["preliminaries"] = preliminaries
+    if validation_issues is not None:
+        updates["validation.issues"] = validation_issues
+    if validation_responses is not None:
+        updates["validation.responses"] = validation_responses
 
     if not updates:
         raise ValueError("No updates provided for statement update.")
@@ -290,6 +327,18 @@ def build_args_from_parsed(args) -> dict:
         mode = args.proof_ref[0]
         values = args.proof_ref[1:]
         kwargs["proof_ref"] = (mode, values)
+    if args.preliminaries:
+        mode = args.preliminaries[0]
+        values = args.preliminaries[1:]
+        kwargs["preliminaries"] = (mode, values)
+    if args.validation_issues:
+        mode = args.validation_issues[0]
+        values = args.validation_issues[1:]
+        kwargs["validation_issues"] = (mode, values)
+    if args.validation_responses:
+        mode = args.validation_responses[0]
+        values = args.validation_responses[1:]
+        kwargs["validation_responses"] = (mode, values)
 
     return kwargs
 
@@ -320,6 +369,12 @@ if __name__ == "__main__":
                         help='Mode (Overwrite/Append) followed by chain-of-thought steps')
     parser.add_argument('--proof.ref', nargs='+', type=str, dest='proof_ref',
                         help='Mode (Overwrite/Append) followed by references')
+    parser.add_argument('--preliminaries', nargs='+', type=str,
+                        help='Mode (Overwrite/Append) followed by preliminary statement IDs')
+    parser.add_argument('--validation.issues', nargs='+', type=str, dest='validation_issues',
+                        help='Mode (Overwrite/Append) followed by validation issues')
+    parser.add_argument('--validation.responses', nargs='+', type=str, dest='validation_responses',
+                        help='Mode (Overwrite/Append) followed by validation responses')
 
     args = parser.parse_args()
 

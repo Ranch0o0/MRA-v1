@@ -108,7 +108,12 @@ Several skills have been created to handle particular execution tasks involving 
 - **Caution** This rewind process is non-reversible. Need to be careful to do so.
 - A terminal confirmation is added to prevent agent mistakenly running this script.
 
-
-
-
-
+## Developer's notes
+- For demo:
+    - Rely more on the model's capacity.
+    - Missing a hook preventing write and edit during the process
+- For real development
+    - Need a status control system.
+- For future development
+    - Experience system: the agent need to learn during practices
+    - Object system: the statements and problems naturally involves objects.

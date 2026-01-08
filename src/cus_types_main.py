@@ -30,7 +30,7 @@ class type_statement:
 
     # With default values:
     hypothesis: list[str] = field(default_factory=list)
-    preliminaries: list[str]
+    preliminaries: list[str] = field(default_factory=list)
     status: str = "pending"
     reliability: float = 0.0
     stats: type_stats = field(default_factory=type_stats)

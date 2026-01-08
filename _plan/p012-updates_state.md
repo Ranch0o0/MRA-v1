@@ -209,18 +209,23 @@ def get_actionable_statements(statements: list[dict]) -> list[dict]:
 
 ### 2.2 Update `get_actionable_problems` function
 
-Modify to check preliminary problem statuses:
+**IMPORTANT**: Problem preliminaries can be either problems OR statements. We need to check both and use appropriate status checks.
+
+Modify to check preliminary statuses (both problems and statements):
 
 ```python
-def get_actionable_problems(problems: list[dict]) -> list[dict]:
+def get_actionable_problems(problems: list[dict], statements: list[dict]) -> list[dict]:
     """Filter problems that are actionable.
 
     Actionable problems are:
     - status = "unresolved"
-    - All preliminary problems (if any) have status = "resolved"
+    - All preliminaries have their required status:
+      - Preliminary problems: status = "resolved"
+      - Preliminary statements: status = "true"
     """
-    # Create a lookup dict for quick status checks
+    # Create lookup dicts for quick status checks
     problem_lookup = {p["id"]: p for p in problems}
+    statement_lookup = {s["id"]: s for s in statements}
 
     actionable = []
     for p in problems:
@@ -228,15 +233,23 @@ def get_actionable_problems(problems: list[dict]) -> list[dict]:
         if p.get("status") != "unresolved":
             continue
 
-        # Second filter: check preliminaries
+        # Second filter: check preliminaries (can be problems or statements)
         preliminaries = p.get("preliminaries", [])
         all_prelim_resolved = True
 
         for prelim_id in preliminaries:
-            prelim = problem_lookup.get(prelim_id)
-            if prelim and prelim.get("status") != "resolved":
-                all_prelim_resolved = False
-                break
+            # Check if it's a problem
+            if prelim_id.startswith("p-"):
+                prelim = problem_lookup.get(prelim_id)
+                if prelim and prelim.get("status") != "resolved":
+                    all_prelim_resolved = False
+                    break
+            # Check if it's a statement
+            elif prelim_id.startswith("s-"):
+                prelim = statement_lookup.get(prelim_id)
+                if prelim and prelim.get("status") != "true":
+                    all_prelim_resolved = False
+                    break
 
         if all_prelim_resolved:
             actionable.append(p)
@@ -298,7 +311,7 @@ def display_statements(statements: list[dict]) -> None:
 
 ### 2.4 Update `show_current_status` function
 
-Update to use the renamed function:
+Update to use the renamed function and pass both problems and statements to `get_actionable_problems`:
 
 ```python
 def show_current_status() -> None:
@@ -308,8 +321,8 @@ def show_current_status() -> None:
     statements = load_all_statements()
 
     # Filter
-    actionable_problems = get_actionable_problems(problems)
-    actionable_statements = get_actionable_statements(statements)  # renamed
+    actionable_problems = get_actionable_problems(problems, statements)  # Pass both!
+    actionable_statements = get_actionable_statements(statements)
 
     # Check for edge case: no actionable items
     if not actionable_problems and not actionable_statements:
@@ -340,7 +353,8 @@ The existing infrastructure is sufficient for the new fields.
 | `src/state.py` | Add args | 3 new CLI args: `--preliminaries`, `--validation.issues`, `--validation.responses` |
 | `src/state.py` | Update functions | Handle new params in `handle_statement`, `_create_statement`, `_update_statement`, `build_args_from_parsed` |
 | `src/current.py` | Rename function | `get_pending_statements` → `get_actionable_statements` |
-| `src/current.py` | Update filter logic | Check preliminary statuses for both problems and statements |
+| `src/current.py` | Update `get_actionable_problems` | Accept both problems and statements; check both problem and statement preliminaries with appropriate status checks |
+| `src/current.py` | Update filter logic | Check preliminary statuses: problems→"resolved", statements→"true" |
 | `src/current.py` | Update display | Show validation status for "validating" statements |
 | `src/utils.py` | No change | Existing infrastructure already supports new fields |
 
