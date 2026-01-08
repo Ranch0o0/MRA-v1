@@ -44,7 +44,7 @@ After merging overlapping skills:
 
 ### Problem Skills (agent-solve)
 
-- [ ] **1. `prob-finish-up`**
+- [x] **1. `prob-finish-up`** *(completed)*
 
   **Purpose**: Mark a problem as solved after a key statement has been proved.
 
@@ -63,7 +63,7 @@ After merging overlapping skills:
 
 ---
 
-- [ ] **2. `prob-setup-subgoal`**
+- [x] **2. `prob-setup-subgoal`** *(completed)*
 
   **Purpose**: Create a new subproblem when the current problem is too complex.
 
@@ -83,7 +83,7 @@ After merging overlapping skills:
 
 ---
 
-- [ ] **3. `prob-wrapup-statement`**
+- [x] **3. `prob-wrapup-statement`** *(completed)*
 
   **Purpose**: Create a statement that, once proved, resolves the problem.
 
@@ -105,7 +105,7 @@ After merging overlapping skills:
 
 ### Statement Skills (agent-prove)
 
-- [ ] **4. `state-complete-proof`**
+- [x] **4. `state-complete-proof`** *(completed)*
 
   **Purpose**: Submit a completed proof for verification.
 
@@ -124,7 +124,7 @@ After merging overlapping skills:
 
 ---
 
-- [ ] **5. `state-setup-substatement`**
+- [x] **5. `state-setup-substatement`** *(completed)*
 
   **Purpose**: Decompose a statement into simpler sub-statements.
 
@@ -145,7 +145,7 @@ After merging overlapping skills:
 
 ---
 
-- [ ] **6. `state-mark-false`** (unified)
+- [x] **6. `state-mark-false`** (unified) *(completed)*
 
   **Purpose**: Mark a statement as false when a counterexample is found.
 
@@ -168,7 +168,7 @@ After merging overlapping skills:
 
 ---
 
-- [ ] **7. `state-propose-modification`** (unified)
+- [x] **7. `state-propose-modification`** (unified) *(completed)*
 
   **Purpose**: Propose a modified statement when the original is unprovable but fixable.
 
@@ -196,7 +196,7 @@ After merging overlapping skills:
 
 ### Check Skills (agent-check)
 
-- [ ] **8. `check-confirm-proof`**
+- [x] **8. `check-confirm-proof`** *(completed)*
 
   **Purpose**: Confirm that a proof is valid and mark the statement as true.
 
@@ -213,7 +213,7 @@ After merging overlapping skills:
 
 ---
 
-- [ ] **9. `check-reject-proof`**
+- [x] **9. `check-reject-proof`** *(completed)*
 
   **Purpose**: Record a gap found during proof verification.
 
@@ -246,7 +246,7 @@ After merging overlapping skills:
 
 ### Fix Skills (agent-fix)
 
-- [ ] **10. `fix-patch-proof`**
+- [x] **10. `fix-patch-proof`** *(completed)*
 
   **Purpose**: Apply a direct fix to the proof text.
 
@@ -278,7 +278,7 @@ After merging overlapping skills:
 
 ---
 
-- [ ] **11. `fix-create-substatement`**
+- [x] **11. `fix-create-substatement`** *(completed)*
 
   **Purpose**: Create a sub-statement to fill a gap, with validation tracking.
 
@@ -379,5 +379,21 @@ src/skills/
 
 ## Status
 
-**Created**: [current date]
-**Status**: Awaiting instruction to begin development
+**Created**: 2026-01-08
+**Status**: COMPLETED - All 11 skills created
+
+### Completed Skills
+
+All skills have been created in `.claude/skills/` with their own subfolders:
+
+1. `prob-wrapup-statement/SKILL.md` - Creates statement to resolve problem
+2. `state-complete-proof/SKILL.md` - Submits proof for verification
+3. `check-confirm-proof/SKILL.md` - Confirms valid proof
+4. `prob-finish-up/SKILL.md` - Marks problem as solved
+5. `prob-setup-subgoal/SKILL.md` - Creates subproblem
+6. `state-setup-substatement/SKILL.md` - Creates sub-statements
+7. `check-reject-proof/SKILL.md` - Records proof gap
+8. `fix-patch-proof/SKILL.md` - Applies direct fix
+9. `fix-create-substatement/SKILL.md` - Creates sub-statement to fill gap
+10. `state-mark-false/SKILL.md` - Marks statement as false
+11. `state-propose-modification/SKILL.md` - Proposes statement modification
