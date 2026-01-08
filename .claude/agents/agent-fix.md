@@ -5,6 +5,7 @@ description: |
   Analyzes the gap, determines if it can be fixed directly, requires a sub-statement, or reveals the statement is false.
   Writes results to the statement JSON file via scripts and reports back to orchestrator.
 tools: Read, Bash
+skills: fix-patch-proof, fix-create-substatement, state-mark-false, state-propose-modification
 model: inherit
 ---
 

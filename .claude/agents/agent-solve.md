@@ -5,6 +5,7 @@ description: |
   Reads the problem file, and either attempt to solve it or decompose the problem into simpler ones (for solving it recursively).
   Writes results to the problem JSON file via scripts and reports back to orchestrator.
 tools: Read, Bash
+skills: prob-finish-up, prob-setup-subgoal, prob-wrapup-statement
 model: inherit
 ---
 

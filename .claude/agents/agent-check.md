@@ -6,6 +6,7 @@ description: |
   and either confirms the proof is valid or identifies the first gap.
   Writes verification results to the statement JSON file via scripts.
 tools: Read, Bash
+skills: check-confirm-proof, check-reject-proof
 model: inherit
 ---
 

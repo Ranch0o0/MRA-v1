@@ -5,6 +5,7 @@ description: |
   Reads the statement file, and either proves it directly or decomposes it into simpler sub-statements for recursive proving.
   Writes results to the statement JSON file via scripts and reports back to orchestrator.
 tools: Read, Bash
+skills: state-complete-proof, state-setup-substatement, state-mark-false, state-propose-modification
 model: inherit
 ---
 
