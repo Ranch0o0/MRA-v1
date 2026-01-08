@@ -135,13 +135,16 @@ Call agent-fix to fix gap in statement [s-XXX]
 
 # Typical Workflow
 
-## 1. Check Current Status
+## 1. Understand the current Status
+There are two ways to identify the status:
+- use the response from the subagents.
+- run the script `src/current.py` via bash:
 
 ```bash
 venv-python src/current.py
 ```
 
-This shows all problems and statements with their current status.
+**Important** Rely primarily on subagent reports for determining what is the next action. Only run `src/current.py` if next step is not determined sololy based on subagent reports.
 
 ## 2. Identify Next Action
 

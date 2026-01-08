@@ -60,3 +60,4 @@ Status: Statement awaiting proof by agent-prove
 - Statement is created with `status = "pending"` and `type = "normal"`
 - The claim should be precise enough for agent-prove to prove directly
 - Premises should include all conditions needed from the problem's hypothesis
+- If adding a currently existing statement to the hypothesis, include its id in the form: `({{statement_id}}) {{statement_content}}`

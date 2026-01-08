@@ -82,3 +82,4 @@ Before using this skill, verify:
 - The sub-statement should be strictly simpler than the parent
 - Parent status remains `validating`
 - The orchestrator will schedule agent-prove for the sub-statement
+- If adding a currently existing statement to the hypothesis, include its id in the form: `({{statement_id}}) {{statement_content}}`

@@ -75,3 +75,4 @@ Status: Sub-statements awaiting proof
 - Together, the sub-statements must be sufficient to prove the parent
 - Avoid redundant sub-statements
 - The parent's status changes to `validating`
+- If adding a currently existing statement to the hypothesis, include its id in the form: `({{statement_id}}) {{statement_content}}`

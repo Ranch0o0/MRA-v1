@@ -58,7 +58,7 @@ Status: Subproblem awaiting solution
 ## Notes
 
 - Subproblem is created with `status = "unresolved"`
-- Hypothesis items can reference existing statements with `(s-XXX)` prefix
+- If adding a currently existing statement to the hypothesis, include its id in the form: `({{statement_id}}) {{statement_content}}`
 - New statements are auto-created for hypothesis items without valid IDs
 - The subproblem should be strictly simpler than the parent
 - Multiple subproblems can be created for the same parent
