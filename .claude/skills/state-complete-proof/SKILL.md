@@ -1,6 +1,6 @@
 ---
 name: state-complete-proof
-description: Submits a completed proof for verification. Use when agent-prove has written a full proof and is ready for agent-check to verify it. Updates the statement with proof text and sets status to awaiting_verification.
+description: Submits a completed proof for verification. Use when agent-prove has written a full proof and is ready for agent-check to verify it. Updates the statement with proof text and sets status to validating.
 ---
 
 # Submit Completed Proof
@@ -9,7 +9,8 @@ Submits a proof for a statement, marking it ready for verification by agent-chec
 
 ## Workflow
 
-1. **Update the statement** with proof text and set status to `awaiting_verification`
+1. **Update the statement** with proof text and set status to `validating`
+2. **Record progress** with `PROOF:` prefix (max 2 sentences)
 
 ## Parameters Required
 
@@ -27,24 +28,26 @@ From the agent:
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status awaiting_verification \
-  --proof.full "Let f be continuous on [a,b]. Since [a,b] is compact and f is continuous, f attains its maximum by the extreme value theorem. QED."
+  --status validating \
+  --proof.full "Let f be continuous on [a,b]. Since [a,b] is compact and f is continuous, f attains its maximum by the extreme value theorem. QED." \
+  --progresses Append "PROOF: Direct proof submitted, 3 steps"
 ```
 
-Output: `Updated s-001 [proof,status] (log: log-XXX)`
+Output: `Updated s-001 [proof,progresses,status] (log: log-XXX)`
 
 ### With chain-of-thought and references
 
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status awaiting_verification \
+  --status validating \
   --proof.full "Step 1: By premise, f is continuous. Step 2: By s-002, [a,b] is compact. Step 3: Continuous functions on compact sets attain their extrema. QED." \
   --proof.cot Overwrite "Identify premises" "Apply compactness lemma" "Conclude from extreme value theorem" \
-  --proof.ref Overwrite "s-002"
+  --proof.ref Overwrite "s-002" \
+  --progresses Append "PROOF: Direct proof using compactness lemma, 3 steps"
 ```
 
-Output: `Updated s-001 [proof,status] (log: log-XXX)`
+Output: `Updated s-001 [proof,progresses,status] (log: log-XXX)`
 
 ## Output Format
 

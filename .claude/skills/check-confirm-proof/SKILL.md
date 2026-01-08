@@ -10,6 +10,7 @@ Marks a statement as verified and true after agent-check confirms all proof step
 ## Workflow
 
 1. **Update the statement** to set `status = "true"` and record verification summary
+2. **Record progress** with `VERIFIED:` prefix (max 2 sentences)
 
 ## Parameters Required
 
@@ -37,7 +38,7 @@ venv-python src/state.py \
   --id s-001 \
   --status true \
   --reliability 1.0 \
-  --progresses Append "Verified: 5 steps checked, all valid"
+  --progresses Append "VERIFIED: 5 steps checked, all valid"
 ```
 
 Output: `Updated s-001 [progresses,reliability,status] (log: log-XXX)`

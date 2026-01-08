@@ -1,6 +1,6 @@
 ---
 name: check-reject-proof
-description: Records a gap found during proof verification. Use when agent-check identifies an invalid sentence in a proof. Appends issue to validate.issues and sets status to has_gap.
+description: Records a gap found during proof verification. Use when agent-check identifies an invalid sentence in a proof. Appends issue to validate.issues and sets status to validating.
 ---
 
 # Record Proof Gap
@@ -10,7 +10,7 @@ Records a gap or error found during proof verification by agent-check.
 ## Workflow
 
 1. **Append the issue** to the statement's `validation.issues` list
-2. **Update status** to `has_gap`
+2. **Keep status** as `validating` (status does not change)
 
 ## Parameters Required
 
@@ -31,7 +31,7 @@ The issue should be formatted as a structured string:
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status has_gap \
+  --status validating \
   --validation.issues Append "[Issue #1] Sentence 3: 'By continuity, f attains max.' | Type: unjustified_leap | Explanation: Continuity alone doesn't imply max attainment; needs compactness. | Fix: Prove [a,b] is compact first."
 ```
 

@@ -35,10 +35,12 @@ Output: `Created statement: s-XXX`
 
 ### Step 2: Link statement to problem's progresses
 
+Use format: `(s-XXX) [brief claim summary]` (max 2 sentences)
+
 ```bash
 venv-python src/prob.py \
   --id p-001 \
-  --progresses Append "s-XXX"
+  --progresses Append "(s-XXX) proves f attains maximum on [a,b]"
 ```
 
 Output: `Updated p-001 [progresses] (log: log-XXX)`

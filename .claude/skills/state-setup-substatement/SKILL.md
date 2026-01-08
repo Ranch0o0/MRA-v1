@@ -12,7 +12,8 @@ Decomposes a statement into simpler sub-statements for recursive proving.
 For each sub-statement:
 1. **Create the sub-statement** using `src/state.py`
 2. **Link to parent** by updating the parent's `preliminaries` list
-3. **Update parent status** to `awaiting_substatements`
+3. **Update parent status** to `validating`
+4. **Record progress** with `DECOMPOSED:` prefix (max 2 sentences)
 
 ## Parameters Required
 
@@ -49,10 +50,11 @@ Output: `Created statement: s-YYY`
 venv-python src/state.py \
   --id s-001 \
   --preliminaries Append "s-XXX" "s-YYY" \
-  --status awaiting_substatements
+  --status validating \
+  --progresses Append "DECOMPOSED: Created s-XXX, s-YYY"
 ```
 
-Output: `Updated s-001 [preliminaries,status] (log: log-XXX)`
+Output: `Updated s-001 [preliminaries,progresses,status] (log: log-XXX)`
 
 ## Output Format
 
@@ -72,4 +74,4 @@ Status: Sub-statements awaiting proof
 - Sub-statements should be strictly simpler than the parent
 - Together, the sub-statements must be sufficient to prove the parent
 - Avoid redundant sub-statements
-- The parent's status changes to `awaiting_substatements`
+- The parent's status changes to `validating`

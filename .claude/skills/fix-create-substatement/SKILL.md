@@ -12,7 +12,7 @@ Creates a sub-statement when a gap requires more than 3 steps to fill.
 1. **Create the sub-statement** using `src/state.py`
 2. **Link to parent** by updating the parent's `preliminaries` list
 3. **Record the fix response** in `validation.responses`
-4. **Update parent status** to `awaiting_substatement`
+4. **Keep parent status** as `validating` (status does not change)
 
 ## Parameters Required
 
@@ -42,7 +42,7 @@ Output: `Created statement: s-XXX`
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status awaiting_substatement \
+  --status validating \
   --preliminaries Append "s-XXX" \
   --validation.responses Append "[Response #1] Fixes Issue #1 | Type: substatement | SubID: s-XXX | Purpose: Establishes compactness of [a,b] to justify extreme value theorem application at sentence 3."
 ```
@@ -80,5 +80,5 @@ Before using this skill, verify:
 
 - Sub-statement is created with `status = "pending"` and `type = "normal"`
 - The sub-statement should be strictly simpler than the parent
-- Parent status changes to `awaiting_substatement` (not `awaiting_substatements`)
+- Parent status remains `validating`
 - The orchestrator will schedule agent-prove for the sub-statement

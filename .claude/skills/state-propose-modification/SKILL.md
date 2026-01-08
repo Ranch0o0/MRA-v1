@@ -9,8 +9,9 @@ Proposes a modified version of a statement when the original is unprovable but c
 
 ## Workflow
 
-1. **Update the statement** to set `status = "needs_modification"` and record the proposal
-2. **If called from fix agent**: Also record the response in `validation.responses`
+1. **Update the statement** to set `status = "validating"` and record the proposal
+2. **Record progress** with `MODIFICATION:` prefix (max 2 sentences)
+3. **If called from fix agent**: Also record the response in `validation.responses`
 
 ## Parameters Required
 
@@ -30,8 +31,8 @@ From the agent:
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status needs_modification \
-  --progresses Append "MODIFICATION PROPOSED: Type=strengthen_premises | Add hypothesis: [a,b] is compact. | Rationale: Continuity alone insufficient for max attainment; need compactness."
+  --status validating \
+  --progresses Append "MODIFICATION: Add hypothesis [a,b] is compact. Continuity alone insufficient."
 ```
 
 Output: `Updated s-001 [progresses,status] (log: log-XXX)`
@@ -41,8 +42,8 @@ Output: `Updated s-001 [progresses,status] (log: log-XXX)`
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status needs_modification \
-  --progresses Append "MODIFICATION PROPOSED: Type=weaken_conclusion | Change: 'f attains maximum' -> 'f is bounded above'. | Rationale: Without compactness, can only prove boundedness."
+  --status validating \
+  --progresses Append "MODIFICATION: Weaken to 'f is bounded above'. Without compactness, can only prove boundedness."
 ```
 
 Output: `Updated s-001 [progresses,status] (log: log-XXX)`
@@ -52,8 +53,8 @@ Output: `Updated s-001 [progresses,status] (log: log-XXX)`
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status needs_modification \
-  --progresses Append "MODIFICATION PROPOSED: Type=add_condition | Add: 'f is bounded'. | Rationale: Gap at sentence 3 requires boundedness assumption." \
+  --status validating \
+  --progresses Append "MODIFICATION: Add 'f is bounded' condition. Gap at sentence 3 requires this." \
   --validation.responses Append "[Response #1] Fixes Issue #1 | Type: modification | ModType: add_condition | Proposal: Add boundedness assumption."
 ```
 

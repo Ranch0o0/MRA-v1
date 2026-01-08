@@ -12,33 +12,15 @@
 
 - The goal is to solve the puzzle by deducing the role of every player. It has been guaranteed that there is a unique solution to the game.
 
-## Game instance
-
+## Game Text
 ---
-Player name: Alice
-Player statement: Among Violet, Quinn, Tina, and Bob, there is exactly one knight.
----
-Player name: David
-Player statement: Among Xavier, Yara, Tina, Alice, Bob, Quinn, and I, there are exactly six knaves.
----
-Player name: Quinn
-Player statement: Among Alice and David, exactly one person is lying.
----
-Player name: Bob
+Player name: Olivia
 Player statement: Alice and I have the same role.
 ---
-Player name: Xavier
-Player statement: Alice, Violet, Yara, Tina, Quinn, and David all have the same role.
+Player name: Alice
+Player statement: I am a spy.
 ---
-Player name: Violet
-Player statement: Among Xavier, Tina, and I, the number of knights is even.
----
-Player name: Yara
-Player statement: Among Violet, Quinn, Alice, Xavier, and Bob, the number of people who are telling the truth is odd.
----
-Player name: Tina
-Player statement: Quinn, Yara, David, and I all have the same role.
+Player name: Ivy
+Player statement: Alice and I have the same role.
 ---
 Message from the game manager: I am the game manager and here is a hint for you: Among all players, there is exactly one spy.
-
-## Solution to the puzzle

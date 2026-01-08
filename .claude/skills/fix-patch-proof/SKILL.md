@@ -11,7 +11,7 @@ Applies a direct fix to the proof text when the gap is a minor omission.
 
 1. **Update the proof** with corrected text
 2. **Record the fix** in `validation.responses`
-3. **Set status** to `awaiting_verification`
+3. **Keep status** as `validating` (status does not change)
 
 ## Parameters Required
 
@@ -28,7 +28,7 @@ From the agent:
 ```bash
 venv-python src/state.py \
   --id s-001 \
-  --status awaiting_verification \
+  --status validating \
   --proof.full "Step 1: f is continuous on [a,b] (given). Step 2: [a,b] is closed and bounded, hence compact by Heine-Borel. Step 3: By extreme value theorem, continuous functions on compact sets attain their maximum. QED." \
   --validation.responses Append "[Response #1] Fixes Issue #1 | Type: patch | Change: Added Step 2 to establish compactness via Heine-Borel before applying EVT."
 ```
