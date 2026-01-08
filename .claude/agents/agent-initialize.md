@@ -1,5 +1,5 @@
 ---
-name: initializer
+name: agent-initialize
 description: |
   Initialize a puzzle by parsing puzzle.md and creating the initial problem structure.
   Reads the puzzle file, extracts hypothesis statements and objectives, then calls

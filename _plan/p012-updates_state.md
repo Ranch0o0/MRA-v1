@@ -1,30 +1,34 @@
 # Updates on statement dataclass
 - Add validation properties
+- Add progresses property
 
 ## Meta Info
-- **Relevant Scripts** 
+- **Relevant Scripts**
     - `src/cus_types_main.py` (already changed)
-    - `src/state.py` (need change)
-    - `src/current.py` (need change)
-    - `src/utils.py` (check if any changes needed)
+    - `src/state.py` (done)
+    - `src/current.py` (done)
+    - `src/utils.py` (no changes needed)
 
 ## Changes in dataclass (in `src/cus_types_main.py`):
 - `type_validation`: new class recording validation process
 - `type_statement`:
     - Add a new property `preliminaries`, to record sub-statements creating during the validation process.
     - Add a new property `validation`, to record the validation process.
+    - Add a new property `progresses`, to record progress items (similar to problems).
 
 ## Instruction
-1. `src/state.py` 
-- Add three params to be received via terminal arguments (refer to `_plan/old/p009-refine-script-feedback.md`) for current setup.
-    - prelimilaries: list[str]
+1. `src/state.py` ✅
+- Add four params to be received via terminal arguments (refer to `_plan/old/p009-refine-script-feedback.md`) for current setup.
+    - preliminaries: list[str]
+        - mode: multiple
+    - progresses: list[str]
         - mode: multiple
     - validation.issues: list[str]
         - mode: multiple
     - validation.responses: list[str]
         - mode: multiple
 
-2. `src/current.py`
+2. `src/current.py` ✅
 - Objective for this script is to print a report for the agent to know what are the "top-layer" problems and statements to be handled.
 
 - Old behavior: 
@@ -45,7 +49,9 @@
     - If len(issues) == len (responses) (including the situation they are both zero), print with clear notice that a new checker is waited to be called to examine the last response.
     - Error handlement: if len(issues) < len (responses) print a clear warning that this is not supposed to happen. Ask agent to further inspect.
 
-3. Please check if any other scripts (especially `src/utils.py`) needs any changes.
+- For statements, also display `progresses` (similar to how problems display progresses).
+
+3. Please check if any other scripts (especially `src/utils.py`) needs any changes. (No changes needed)
 
 ---
 
@@ -71,12 +77,14 @@ preliminaries: list[str] = field(default_factory=list)
 
 ### 1.1 Add new arguments to argparse
 
-Add three new multiple-value parameters following the existing pattern (mode + values):
+Add four new multiple-value parameters following the existing pattern (mode + values):
 
 ```python
 # After line 322 (existing --proof.ref argument)
 parser.add_argument('--preliminaries', nargs='+', type=str,
                     help='Mode (Overwrite/Append) followed by preliminary statement IDs')
+parser.add_argument('--progresses', nargs='+', type=str,
+                    help='Mode (Overwrite/Append) followed by progress items')
 parser.add_argument('--validation.issues', nargs='+', type=str, dest='validation_issues',
                     help='Mode (Overwrite/Append) followed by validation issues')
 parser.add_argument('--validation.responses', nargs='+', type=str, dest='validation_responses',
@@ -99,6 +107,7 @@ def handle_statement(
     proof_full: Optional[str] = None,
     proof_ref: Optional[tuple[str, list[str]]] = None,
     preliminaries: Optional[tuple[str, list[str]]] = None,       # NEW
+    progresses: Optional[tuple[str, list[str]]] = None,          # NEW
     validation_issues: Optional[tuple[str, list[str]]] = None,   # NEW
     validation_responses: Optional[tuple[str, list[str]]] = None, # NEW
     root_change: bool = True
@@ -115,6 +124,11 @@ Add handling for new parameters in create mode (around lines 94-153):
 if preliminaries is not None:
     _, values = preliminaries
     statement.preliminaries = list(values)
+
+# Handle progresses if provided
+if progresses is not None:
+    _, values = progresses
+    statement.progresses = list(values)
 
 # Handle validation fields if provided
 if validation_issues is not None:
@@ -133,6 +147,8 @@ Add handling for new parameters in update mode (around lines 184-252):
 # After line 225 (after proof_ref handling)
 if preliminaries is not None:
     updates["preliminaries"] = preliminaries
+if progresses is not None:
+    updates["progresses"] = progresses
 if validation_issues is not None:
     updates["validation.issues"] = validation_issues
 if validation_responses is not None:
@@ -149,6 +165,10 @@ if args.preliminaries:
     mode = args.preliminaries[0]
     values = args.preliminaries[1:]
     kwargs["preliminaries"] = (mode, values)
+if args.progresses:
+    mode = args.progresses[0]
+    values = args.progresses[1:]
+    kwargs["progresses"] = (mode, values)
 if args.validation_issues:
     mode = args.validation_issues[0]
     values = args.validation_issues[1:]
@@ -285,6 +305,15 @@ def display_statements(statements: list[dict]) -> None:
         else:
             print("    (none)")
 
+        # Progresses
+        print("  Progresses:")
+        progresses = s.get("progresses", [])
+        if progresses:
+            for prog in progresses:
+                print(f"    - {prog}")
+        else:
+            print("    (none)")
+
         # For validating statements, show validation status
         if status == "validating":
             validation = s.get("validation", {})
@@ -349,13 +378,13 @@ The existing infrastructure is sufficient for the new fields.
 
 | File | Change Type | Description |
 |------|-------------|-------------|
-| `src/cus_types_main.py` | Fix | Add `= field(default_factory=list)` to `preliminaries` |
-| `src/state.py` | Add args | 3 new CLI args: `--preliminaries`, `--validation.issues`, `--validation.responses` |
+| `src/cus_types_main.py` | Fix | Add `= field(default_factory=list)` to `preliminaries` and `progresses` |
+| `src/state.py` | Add args | 4 new CLI args: `--preliminaries`, `--progresses`, `--validation.issues`, `--validation.responses` |
 | `src/state.py` | Update functions | Handle new params in `handle_statement`, `_create_statement`, `_update_statement`, `build_args_from_parsed` |
-| `src/current.py` | Rename function | `get_pending_statements` → `get_actionable_statements` |
+| `src/current.py` | Rename function | `get_pending_statements` -> `get_actionable_statements` |
 | `src/current.py` | Update `get_actionable_problems` | Accept both problems and statements; check both problem and statement preliminaries with appropriate status checks |
-| `src/current.py` | Update filter logic | Check preliminary statuses: problems→"resolved", statements→"true" |
-| `src/current.py` | Update display | Show validation status for "validating" statements |
+| `src/current.py` | Update filter logic | Check preliminary statuses: problems->"resolved", statements->"true" |
+| `src/current.py` | Update display | Show validation status for "validating" statements; show progresses for all statements |
 | `src/utils.py` | No change | Existing infrastructure already supports new fields |
 
 ---
@@ -367,19 +396,26 @@ The existing infrastructure is sufficient for the new fields.
    venv-python src/state.py --type proposition --conclusion "Test" --preliminaries Overwrite s-001 s-002
    ```
 
-2. **Update statement with validation issues**:
+2. **Create/Update statement with progresses**:
+   ```bash
+   venv-python src/state.py --type proposition --conclusion "Test" --progresses Overwrite "Step 1" "Step 2"
+   venv-python src/state.py --id s-001 --progresses Append "Step 3"
+   ```
+
+3. **Update statement with validation issues**:
    ```bash
    venv-python src/state.py --id s-001 --validation.issues Append "Issue 1" --status validating
    ```
 
-3. **Update statement with validation responses**:
+4. **Update statement with validation responses**:
    ```bash
    venv-python src/state.py --id s-001 --validation.responses Append "Response 1"
    ```
 
-4. **Check current status displays correctly**:
+5. **Check current status displays correctly**:
    ```bash
    venv-python src/current.py
    ```
    - Verify pending statements with unresolved preliminaries are hidden
    - Verify validating statements show correct validation status
+   - Verify progresses are displayed for statements

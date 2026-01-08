@@ -166,6 +166,15 @@ def display_statements(statements: list[dict]) -> None:
         else:
             print("    (none)")
 
+        # Progresses
+        print("  Progresses:")
+        progresses = s.get("progresses", [])
+        if progresses:
+            for prog in progresses:
+                print(f"    - {prog}")
+        else:
+            print("    (none)")
+
         # For validating statements, show validation status
         if status == "validating":
             validation = s.get("validation", {})

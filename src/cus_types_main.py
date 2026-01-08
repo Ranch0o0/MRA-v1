@@ -34,6 +34,7 @@ class type_statement:
     status: str = "pending"
     reliability: float = 0.0
     stats: type_stats = field(default_factory=type_stats)
+    progresses: list[str] = field(default_factory=list)
     proof: type_argument = field(default_factory=type_argument)
     validation: type_validation = field(default_factory=type_validation)
 

@@ -43,6 +43,7 @@ def handle_statement(
     proof_full: Optional[str] = None,
     proof_ref: Optional[tuple[str, list[str]]] = None,
     preliminaries: Optional[tuple[str, list[str]]] = None,
+    progresses: Optional[tuple[str, list[str]]] = None,
     validation_issues: Optional[tuple[str, list[str]]] = None,
     validation_responses: Optional[tuple[str, list[str]]] = None,
     root_change: bool = True
@@ -60,6 +61,7 @@ def handle_statement(
         proof_full: Full proof text
         proof_ref: Proof references (mode, values)
         preliminaries: Preliminary statement IDs (mode, values)
+        progresses: Progress items (mode, values)
         validation_issues: Validation issues (mode, values)
         validation_responses: Validation responses (mode, values)
         root_change: If True, commit changes; if False, return changes for parent
@@ -80,6 +82,7 @@ def handle_statement(
             proof_full=proof_full,
             proof_ref=proof_ref,
             preliminaries=preliminaries,
+            progresses=progresses,
             validation_issues=validation_issues,
             validation_responses=validation_responses,
             root_change=root_change
@@ -97,6 +100,7 @@ def handle_statement(
             proof_full=proof_full,
             proof_ref=proof_ref,
             preliminaries=preliminaries,
+            progresses=progresses,
             validation_issues=validation_issues,
             validation_responses=validation_responses,
             root_change=root_change
@@ -113,6 +117,7 @@ def _create_statement(
     proof_full: Optional[str],
     proof_ref: Optional[tuple[str, list[str]]],
     preliminaries: Optional[tuple[str, list[str]]],
+    progresses: Optional[tuple[str, list[str]]],
     validation_issues: Optional[tuple[str, list[str]]],
     validation_responses: Optional[tuple[str, list[str]]],
     root_change: bool
@@ -158,6 +163,11 @@ def _create_statement(
     if preliminaries is not None:
         _, values = preliminaries
         statement.preliminaries = list(values)
+
+    # Handle progresses if provided
+    if progresses is not None:
+        _, values = progresses
+        statement.progresses = list(values)
 
     # Handle validation fields if provided
     if validation_issues is not None:
@@ -220,6 +230,7 @@ def _update_statement(
     proof_full: Optional[str],
     proof_ref: Optional[tuple[str, list[str]]],
     preliminaries: Optional[tuple[str, list[str]]],
+    progresses: Optional[tuple[str, list[str]]],
     validation_issues: Optional[tuple[str, list[str]]],
     validation_responses: Optional[tuple[str, list[str]]],
     root_change: bool
@@ -256,6 +267,8 @@ def _update_statement(
         updates["proof.ref"] = proof_ref
     if preliminaries is not None:
         updates["preliminaries"] = preliminaries
+    if progresses is not None:
+        updates["progresses"] = progresses
     if validation_issues is not None:
         updates["validation.issues"] = validation_issues
     if validation_responses is not None:
@@ -331,6 +344,10 @@ def build_args_from_parsed(args) -> dict:
         mode = args.preliminaries[0]
         values = args.preliminaries[1:]
         kwargs["preliminaries"] = (mode, values)
+    if args.progresses:
+        mode = args.progresses[0]
+        values = args.progresses[1:]
+        kwargs["progresses"] = (mode, values)
     if args.validation_issues:
         mode = args.validation_issues[0]
         values = args.validation_issues[1:]
@@ -371,6 +388,8 @@ if __name__ == "__main__":
                         help='Mode (Overwrite/Append) followed by references')
     parser.add_argument('--preliminaries', nargs='+', type=str,
                         help='Mode (Overwrite/Append) followed by preliminary statement IDs')
+    parser.add_argument('--progresses', nargs='+', type=str,
+                        help='Mode (Overwrite/Append) followed by progress items')
     parser.add_argument('--validation.issues', nargs='+', type=str, dest='validation_issues',
                         help='Mode (Overwrite/Append) followed by validation issues')
     parser.add_argument('--validation.responses', nargs='+', type=str, dest='validation_responses',
