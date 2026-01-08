@@ -19,18 +19,26 @@ venv-python: aliased to /Users/zhenkun/Documents/Python/Virtual_environment/bin/
 - Use slash command `/resume`
 
 4. To run the puzzle-solving process for several steps ((changes in log id))
-- Use slash command `/step $ARGUMENT`
+- Use slash command `/step $ARGUMENTS`
 - `$ARGUMENT` should be the number of steps you would like the claude code agent to proceed.
-<exampe>
+<example>
 /step 5
-</exampe>
+</example>
 
-**Important** If any slash command does not work as expected, may check if global slash commands collide with project level slash command (actually I do not know if they might ever be a problem as claude code may have hieratical structure)
+5. To run the process with one step and inject human instructions:
+- Use slash command `/instruct $ARGUMENTS`
+- `$ARGUMENT` should include: which agent to call and what are the instructions.
+<example>
+/instruct agent-check: please check statement (s-010) and especially the third sentence is problematic, since the situation that spy can either tell the truth or lying seems to be overlooked.
+</example>
 
-5. To rewind to a past status
+**Important** If any slash command does not work as expected, check if global slash commands collide with project level slash commands.
+
+6. To rewind to a past status
 - Find the log id you want to rewind to.
 - Modify the main block of the script `src/rewind.py`
 - Run the script, and confirm in terminal.
+**Caution** This is non-reversible. Use github version control if you want to go back and force or even exploring multi-branches.
 
 # File structure
 Root folder
@@ -57,13 +65,15 @@ Several commands has been included to quickly test on the puzzle.
 - `/start`
 - `/resume`
 - `/step`
+- `/instruct`
 
 2. Agents
 Several agents have been designed to handle different type of logic tasks to solve the puzzle.
-- `initializer`: to initialize the puzzle. Only called once at the start.
-- `planer`:
-- `prover`: 
-- `checker`:
+- `agent-initialize`: Parses `puzzle.md` and creates the initial problem `p-001`. Called once at start.
+- `agent-solve`: Works on problems. Creates statements to prove or decomposes into subproblems.
+- `agent-prove`: Proves statements directly or decomposes into sub-statements.
+- `agent-check`: Verifies proofs sentence-by-sentence. Confirms validity or identifies gaps.
+- `agent-fix`: Fixes gaps in proofs. Patches minor issues or creates sub-statements for major gaps.
 
 3. Skills
 Several skills have been created to handle particular execution tasks involving scripts.
@@ -73,47 +83,70 @@ Several skills have been created to handle particular execution tasks involving 
 - A simple principle: all three things are simply prompt/context engineering, and all three are about editing markdown files.
 - Trade-off: all these three blocks are not hard-coded constraints for our math reasoning system. They are built upon the prompt-following capacity and large enough context window of the base model.
 
+## Status values
+
+### Problem status
+| Status | Meaning |
+|--------|---------|
+| `unresolved` | Default. Problem needs work. |
+| `resolved` | Complete. Objective achieved via proved statement(s). |
+
+### Statement status
+| Status | Meaning |
+|--------|---------|
+| `pending` | Default. Statement needs proof. |
+| `validating` | Proof submitted or has issues being processed. |
+| `true` | Verified. Can be cited as lemma. |
+| `false` | Counterexample found. Cannot be proved. |
+| `abandoned` | Beyond scope or no longer needed. |
+
+For `validating` statements, check `validation.issues` vs `validation.responses` to determine sub-state.
+
 ## Task management
 1. Object `problem`
 - Tasks are managed via objects called "problem". A problem phrases a task to be resolved.
-- Tasks are nested via the `preliminaries` property: if the planer agent decide a problem is too complicated to be resolved directly, he will instead create sub-problems aiming partial progresses. The problem id will be added to preliminaries to indicate the nested relation.
+- Tasks are nested via the `preliminaries` property: if a problem is too complicated, agent-solve creates sub-problems. The sub-problem id is added to `preliminaries`.
 - Progressive notes can be added to the `progresses` property.
 
 2. Script `src/prob.py`
-- Handles the problem creation and update.
+- Handles problem creation and update.
 
 3. Script `src/prob_init.py`
-- Only handles the initialization based on the original puzzle.
+- Handles initialization based on the original puzzle.
 
 ## Tree of logic
 1. Object `statement`
-- Logic tree are realized via objects called "statement". A statement is a vertex of the tree. Edges conceptually correspond to `hypothesis` property.
+- Logic trees are realized via objects called "statement". A statement is a vertex of the tree.
+- Sub-statements are linked via the `preliminaries` property.
 
 2. Script `src/state.py`
-- Handles the statement creation and update.
+- Handles statement creation and update.
 
 ## Experience
 - **To be developed**
-- Similar to "memory" or "self-involving system".
-- Supposed to make it possible for the system to reflect on wrong answers and analyze what has been done wrongly and what to be imporves.
-- Expected to be able to inject past experiences when handling new puzzles.
+- Similar to "memory" or "self-improving system".
+- Supposed to enable the system to reflect on wrong answers and analyze what went wrong.
+- Expected to inject past experiences when handling new puzzles.
 
 ## History
 1. Script `src/utils.py`
-- Has a log Manager that logs every changes (creation or update) of objects.
+- Has a LogManager that logs every change (creation or update) of objects.
 - Each change is associated with a log id.
 
 2. Script `src/rewind.py`
 - Can rewind to any past status via log id.
-- **Caution** This rewind process is non-reversible. Need to be careful to do so.
+- **Caution** This rewind process is non-reversible. Need to be careful to do so. Use github version control if you want to go back and force or even exploring multi-branches.
 - A terminal confirmation is added to prevent agent mistakenly running this script.
 
 ## Developer's notes
 - For demo:
     - Rely more on the model's capacity.
-    - Missing a hook preventing write and edit during the process
-- For real development
-    - Need a status control system.
-- For future development
-    - Experience system: the agent need to learn during practices
-    - Object system: the statements and problems naturally involves objects.
+    - Missing a hook preventing write and edit during the process.
+- For real development:
+    - May change "problem" to "task".
+    - May refine custom types to make more modular usage and skills.
+    - May develop a status system to better control the workflow.
+- For future development:
+    - Experience system: the agent needs to learn during practice.
+    - Object system: statements and problems naturally involve objects.
+    - Terminology system: objects are defined regulated by terms, and experiences may be associated to terms as well.

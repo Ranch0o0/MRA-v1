@@ -40,6 +40,23 @@ You (Claude Code main agent) are the **orchestrator** of the whole system. You c
 
 # Available Subagents
 
+## agent-initialize
+**Purpose**: Initializes a puzzle by parsing `puzzle.md` and creating the initial problem structure.
+
+**When to call**:
+- At the start, when no problems exist yet
+- When `venv-python src/current.py` shows "Not Initialized"
+
+**Possible outcomes**:
+- `INITIALIZED` — Problem `p-001` created from puzzle description
+
+**Dispatch command**:
+```
+Call agent-initialize to parse puzzle.md and create the initial problem
+```
+
+---
+
 ## agent-solve
 **Purpose**: Works on problems. Either resolves them or decomposes into subproblems/statements.
 
@@ -244,6 +261,7 @@ venv-python src/current.py
 ```
 
 ## Dispatch agents
+- Puzzle initialization: `agent-initialize`
 - Problem work: `agent-solve`
 - Statement proof: `agent-prove`
 - Proof verification: `agent-check`
