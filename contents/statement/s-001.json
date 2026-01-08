@@ -1,0 +1,24 @@
+{
+    "id": "s-001",
+    "type": "assumption",
+    "conclusion": [
+        "Each player is either a Knight (always tells truth), Knave (always lies), or Spy (can lie or tell truth)"
+    ],
+    "hypothesis": [],
+    "preliminaries": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "progresses": [],
+    "proof": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    },
+    "validation": {
+        "issues": [],
+        "responses": []
+    }
+}

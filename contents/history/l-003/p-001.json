@@ -1,0 +1,24 @@
+{
+    "id": "p-001",
+    "hypothesis": [
+        "(s-001) Each player is either a Knight (always tells truth), Knave (always lies), or Spy (can lie or tell truth)",
+        "(s-002) Olivia says: Alice and I have the same role",
+        "(s-003) Alice says: I am a spy",
+        "(s-004) Ivy says: Alice and I have the same role",
+        "(s-005) There is exactly one spy among all players",
+        "(s-006) There is a unique solution to the puzzle"
+    ],
+    "objectives": [
+        "Determine the role of each player: Olivia, Alice, and Ivy"
+    ],
+    "status": "unresolved",
+    "priority": "",
+    "summary": "",
+    "progresses": [],
+    "preliminaries": [],
+    "solution": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    }
+}

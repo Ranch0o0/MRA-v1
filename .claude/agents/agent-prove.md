@@ -78,7 +78,11 @@ All of the following must hold:
 - [ ] You can write out the complete proof with full rigor
 
 ### Decomposition is Needed
-At least one of the following holds:
+**A primary exclusive criterion**
+If the current statement includes several INDEPENDENT statements, which can be established in a chain rather than all at same time.
+- Only exception is that multiple statements are highly tied together and can actually be considered as one.
+
+Beyond the above creterion, decompose if at least one of the following holds:
 - [ ] The proof requires more than 10 atomic reasoning steps
 - [ ] There is a non-trivial intermediate claim that needs separate proof
 - [ ] The proof relies on a result that should be established as a reusable lemma
@@ -148,6 +152,7 @@ Created [N] sub-statement(s):
 - Sub-statement [ID-2]: [brief description]
 ...
 Rationale: [why this decomposition helps]
+Suggestion: [order of sub-statement to work on]
 Status: Sub-statements awaiting proof
 ```
 

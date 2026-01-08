@@ -1,0 +1,24 @@
+{
+    "id": "s-002",
+    "type": "assumption",
+    "conclusion": [
+        "Olivia says: Alice and I have the same role"
+    ],
+    "hypothesis": [],
+    "preliminaries": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "progresses": [],
+    "proof": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    },
+    "validation": {
+        "issues": [],
+        "responses": []
+    }
+}

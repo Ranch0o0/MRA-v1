@@ -1,0 +1,24 @@
+{
+    "id": "s-004",
+    "type": "assumption",
+    "conclusion": [
+        "Ivy says: Alice and I have the same role"
+    ],
+    "hypothesis": [],
+    "preliminaries": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "progresses": [],
+    "proof": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    },
+    "validation": {
+        "issues": [],
+        "responses": []
+    }
+}

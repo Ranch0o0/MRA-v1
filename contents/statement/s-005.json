@@ -1,0 +1,24 @@
+{
+    "id": "s-005",
+    "type": "assumption",
+    "conclusion": [
+        "There is exactly one spy among all players"
+    ],
+    "hypothesis": [],
+    "preliminaries": [],
+    "status": "true",
+    "reliability": 0.0,
+    "stats": {
+        "count_usage": 0
+    },
+    "progresses": [],
+    "proof": {
+        "cot": [],
+        "full": "",
+        "ref": []
+    },
+    "validation": {
+        "issues": [],
+        "responses": []
+    }
+}

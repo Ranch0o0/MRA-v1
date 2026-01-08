@@ -78,10 +78,27 @@ Several agents have been designed to handle different type of logic tasks to sol
 3. Skills
 Several skills have been created to handle particular execution tasks involving scripts.
 
+**Statement skills** (used by agents to update statement objects):
+- `state-complete-proof`: Submit a completed proof for verification (sets status to validating).
+- `state-setup-substatement`: Decompose a statement into simpler sub-statements.
+- `state-mark-false`: Mark a statement as false when a counterexample is found.
+- `state-propose-modification`: Propose a modified statement when original is unprovable but fixable.
+
+**Problem skills** (used by agents to update problem objects):
+- `prob-wrapup-statement`: Create a statement that resolves a problem.
+- `prob-finish-up`: Mark a problem as resolved after key statement is proved.
+- `prob-setup-subgoal`: Create a subproblem when current problem is too complex.
+
+**Verification skills** (used by agent-check and agent-fix):
+- `check-confirm-proof`: Confirm a proof is valid and mark statement as true.
+- `check-reject-proof`: Record a gap found during proof verification.
+- `fix-patch-proof`: Apply a direct fix to proof text (minor additions, 3 or fewer steps).
+- `fix-create-substatement`: Create a sub-statement to fill a gap identified by agent-check.
+
 **Special remarks**
 - The claude code system has a few building blocks: slash commands, subagents, skills, and many more (e.g. hooks, mcps). In this demo, we only use these three (as they are simple but already powerful).
 - A simple principle: all three things are simply prompt/context engineering, and all three are about editing markdown files.
-- Trade-off: all these three blocks are not hard-coded constraints for our math reasoning system. They are built upon the prompt-following capacity and large enough context window of the base model.
+- Trade-off: all these three blocks (commands, agents, skills) are not hard-coded constraints for our math reasoning system. They are built upon the prompt-following capacity and large enough context window of the base model.
 
 ## Status values
 
