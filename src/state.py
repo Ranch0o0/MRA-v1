@@ -1,12 +1,89 @@
 import argparse
+import json
+import os
+import re
 from dataclasses import asdict
 from typing import Optional
 
 from cus_types_main import type_statement, type_object_change
-from utils import IDManager, handle_changes, load_object
+from utils import IDManager, handle_changes, load_object, OBJECT_FOLDERS
 
 
 VALID_TYPES = ["assumption", "proposition", "normal"]
+STATEMENT_FOLDER = OBJECT_FOLDERS["s"]
+
+
+def parse_statement_id(text: str) -> str | None:
+    """Extract statement ID from text starting with (s-...) or (e-...).
+
+    Args:
+        text: Input text to parse
+
+    Returns:
+        Statement ID if found, else None
+    """
+    text = text.lstrip()
+    if not text.startswith('('):
+        return None
+
+    match = re.match(r'^\(([se]-[a-z]*\d+)\)', text)
+    if match:
+        return match.group(1)
+    return None
+
+
+def load_statement_conclusion(statement_id: str) -> str | None:
+    """Load conclusion from statement file.
+
+    Args:
+        statement_id: Statement ID (e.g., "s-001")
+
+    Returns:
+        Conclusion text (joined from list) if file exists, else None
+    """
+    statement_path = os.path.join(STATEMENT_FOLDER, f"{statement_id}.json")
+
+    if not os.path.exists(statement_path):
+        return None
+
+    try:
+        with open(statement_path, 'r') as f:
+            statement_data = json.load(f)
+
+        conclusion = statement_data.get('conclusion', [])
+        if isinstance(conclusion, list):
+            return ' '.join(conclusion)
+        return str(conclusion)
+    except Exception:
+        return None
+
+
+def process_hypothesis_item(item: str) -> str:
+    """Process single hypothesis item for statement creation.
+
+    Args:
+        item: Hypothesis item text
+
+    Returns:
+        Formatted hypothesis string
+    """
+    # Check for existing statement ID
+    statement_id = parse_statement_id(item)
+
+    if statement_id:
+        # Try to load the statement
+        conclusion = load_statement_conclusion(statement_id)
+        if conclusion:
+            # Existing statement found
+            return f"({statement_id}) {conclusion}"
+
+        # ID format valid but file doesn't exist - strip invalid ID
+        cleaned_text = re.sub(r'^\([se]-[a-z]*\d+\)\s*', '', item.lstrip()).strip()
+        # If after stripping the ID there's text remaining, use it; otherwise use original
+        return cleaned_text if cleaned_text else item.strip()
+    else:
+        # No ID pattern found, use original text
+        return item.strip()
 
 
 def validate_statement_id(obj_id: str) -> bool:
@@ -144,10 +221,11 @@ def _create_statement(
         reliability=reliability if reliability is not None else 0.0
     )
 
-    # Handle hypothesis if provided (extract values from mode tuple)
+    # Handle hypothesis if provided (extract values from mode tuple and process each item)
     if hypothesis is not None:
         _, values = hypothesis
-        statement.hypothesis = list(values)
+        processed_hypothesis = [process_hypothesis_item(item) for item in values]
+        statement.hypothesis = processed_hypothesis
 
     # Handle proof fields
     if proof_cot is not None:

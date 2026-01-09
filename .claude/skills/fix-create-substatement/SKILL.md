@@ -26,7 +26,7 @@ From the agent:
 
 ## Sample Commands
 
-### Step 1: Create the sub-statement
+### Step 1: Create the sub-statement(s)
 
 ```bash
 venv-python src/state.py \
@@ -36,6 +36,10 @@ venv-python src/state.py \
 ```
 
 Output: `Created statement: s-XXX`
+
+**Note**
+1. When adding exisitng conclusions as hypothesis, can only include the statement id: `--hypothesis Overwrite "(s-xxx)"`.
+2. If multiple substatements are needed, run the script multiple times, and one for each substatement.
 
 ### Step 2: Link to parent and record response
 

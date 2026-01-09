@@ -34,6 +34,9 @@ venv-python src/prob.py \
 
 Output: `Created problem: p-XXX` (or `Created problem: p-XXX [+N statements]` if new statements were created from hypothesis)
 
+**Note**
+When adding exisitng conclusions as hypothesis, can only include the statement id: `--hypothesis "(s-xxx)"`.
+
 ### Step 2: Link subproblem to parent's preliminaries
 
 ```bash

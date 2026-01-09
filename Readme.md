@@ -85,7 +85,7 @@ Several skills have been created to handle particular execution tasks involving 
 - `state-propose-modification`: Propose a modified statement when original is unprovable but fixable.
 
 **Problem skills** (used by agents to update problem objects):
-- `prob-wrapup-statement`: Create a statement that resolves a problem.
+- `prob-core-statement`: Create a statement that resolves a problem.
 - `prob-finish-up`: Mark a problem as resolved after key statement is proved.
 - `prob-setup-subgoal`: Create a subproblem when current problem is too complex.
 

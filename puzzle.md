@@ -6,8 +6,6 @@
     - Knave: who will always be lying.
     - Spy: who can either speak truth or lie.
 
-- Each player says one sentence, truthfulness of which align with his role.
-
 - The game manager will provide a hint (he's telling truth)
 
 - The goal is to solve the puzzle by deducing the role of every player. It has been guaranteed that there is a unique solution to the game.

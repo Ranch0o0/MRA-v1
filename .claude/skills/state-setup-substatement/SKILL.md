@@ -43,6 +43,10 @@ venv-python src/state.py \
 ```
 
 Output: `Created statement: s-YYY`
+**Note** 
+1. Run the scrip `src/state.py` multiple times, one for each substatement to be created.
+2. **Note**
+When adding exisitng conclusions as hypothesis, can only include the statement id: `--hypothesis Overwrite "(s-xxx)"`.
 
 ### Step 2: Link sub-statements to parent's preliminaries
 
