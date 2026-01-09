@@ -54,21 +54,23 @@ because [specific justification]
 1. Receive the statement path from the orchestrator
 
 2. Read the statement JSON file to understand:
-   - `claim` — the mathematical assertion being proved
+   - `claim` — the mathematical assertion being evaluated
    - `premises` — conditions assumed true
-   - `proof` — the proof text with the gap
-   - `validate.issues` — list of all identified gaps (historical)
+   - `proof` — the argument text (proof or disproof) with the issue
+   - `validate.issues` — list of all identified gaps/issues (historical)
    - `validate.responses` — list of all fixes applied (historical)
 
-3. Identify the current issue to fix:
-   - The **newest issue** is the one to address (last item in `validate.issues`)
-   - Previous issues have already been addressed by previous responses
-   - Do NOT re-fix issues that already have corresponding responses
+3. **Identify issue type** from the newest issue:
+   - **Type A: Standard gap** — Proof/disproof has a logical gap that needs fixing
+   - **Type B: Modification request** — Disproof verified but suggests clear modification
 
-4. Carefully analyze:
-   - The proof up to the gap point (what has been established)
-   - The gap sentence (what was attempted)
-   - The remainder of the proof (what depended on the gap)
+   Check the issue text for keywords:
+   - Contains "modification suggested" or "needs modification" → Type B
+   - Otherwise → Type A
+
+4. Carefully analyze based on issue type:
+   - **Type A**: The argument up to the gap point, the gap sentence, and remainder
+   - **Type B**: The suggested modification and how it addresses the disproof
 
 ## Phase 1.5: Validation History Review
 
@@ -90,11 +92,13 @@ Error type: [type]
 
 **Important**: Only fix the current (newest) issue. Previous issues are historical context only.
 
-## Phase 2: Gap Classification
+## Phase 2: Issue Classification
+
+### For Type A (Standard Gap)
 
 Determine which situation applies using these explicit criteria:
 
-### Situation 1: Direct Fix
+#### Situation 1: Direct Fix
 All of the following must hold:
 - [ ] The gap is a minor omission (missing justification, not missing logic)
 - [ ] The fix requires at most 3 additional atomic steps
@@ -106,7 +110,7 @@ Examples:
 - Skipped algebraic step that's easy to fill in
 - Unstated but obvious definition application
 
-### Situation 2: Sub-statement Needed
+#### Situation 2: Sub-statement Needed
 At least one of the following holds:
 - [ ] The gap requires a non-trivial intermediate result
 - [ ] Filling the gap would take more than 3 atomic steps
@@ -118,7 +122,7 @@ Examples:
 - Implicit use of a bound that needs to be established
 - Case that was claimed "similar" but actually needs separate proof
 
-### Situation 3: Statement is Flawed
+#### Situation 3: Statement is Flawed
 At least one of the following holds:
 - [ ] You can construct a counterexample to the gap's claim
 - [ ] The gap reveals the original statement is too strong
@@ -129,6 +133,19 @@ Examples:
 - The gap step is actually false (counterexample exists)
 - The proof assumed something not in the premises
 - The statement needs additional hypotheses to be true
+
+### For Type B (Modification Request)
+
+This is a special case where agent-check verified a disproof and suggests modifying the statement.
+
+**Your task**:
+1. Review the disproof and understand why the original statement is false
+2. Evaluate the suggested modification from agent-check
+3. Decide whether to apply the modification or mark as simply false
+
+#### Decision criteria:
+- **Apply modification** if: The suggestion is clear, minimal, and makes the statement provable
+- **Mark as false** if: No reasonable modification exists, or modification would be too complex
 
 ## Phase 3: Action Execution
 
@@ -269,6 +286,60 @@ Status: Awaiting orchestrator decision
 ```
 
 The orchestrator will decide whether to accept, reject, or escalate.
+
+### For Type B: Modification Request
+
+Review the modification suggestion:
+
+```
+MODIFICATION REVIEW:
+Issue content: [text from validate.issues[-1]]
+Suggested modification: [what agent-check proposed]
+Why needed: [what the disproof revealed]
+Complexity: [Simple / Moderate / Complex]
+```
+
+Then decide:
+
+#### If Modification is Appropriate
+Apply the suggested modification using the modification skill.
+
+**Action**: Load skill `state-propose-modification` to:
+1. Update the statement claim with the modification
+2. Append the modification response to `validate.responses`
+3. Return a summary to the orchestrator
+
+**Report to orchestrator**:
+```
+MODIFICATION APPLIED: Statement [ID]
+Original claim: [old claim]
+Modified claim: [new claim]
+Reason: Disproof revealed [issue], modification addresses this
+Issue #[N] resolved: [description]
+Validation history: [X] issues, [X] responses (modification applied)
+Status: Modified statement awaiting new proof by agent-prove
+```
+
+The orchestrator will schedule agent-prove to prove the modified statement.
+
+#### If Modification Not Appropriate
+Mark the statement as false using the false-marking skill.
+
+**Action**: Load skill `state-mark-false` to:
+1. Mark the statement as false
+2. Record the disproof as the reason
+3. Append response to `validate.responses`
+4. Return a summary to the orchestrator
+
+**Report to orchestrator**:
+```
+MARKED FALSE: Statement [ID]
+Claim: [the claim]
+Reason: Disproof verified, no reasonable modification exists
+Issue #[N] resolved: [description]
+Validation history: [X] issues, [X] responses (final - marked false)
+Impact: Parent problem/statement needs revision
+```
 
 # Principles
 

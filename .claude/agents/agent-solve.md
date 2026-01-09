@@ -51,7 +51,7 @@ DECISION: [Situation 1/2/3] because [specific justification]
 
 3. Explore `contents/problem/` and `contents/statement/` for relevant context.
 
-**Critical Rule**: Only rely on statements where `status == "true"`. Unproven statements (status != "true") must NOT be used as premises in any reasoning.
+**Critical Rule**: Only use statements where `status == "true"` as lemmas. Also utilize `status == "false"` statement and use its converse. "pending" or "validating" statements must NOT be cited in your proof.
 
 ## Phase 2: Situation Classification
 
@@ -133,9 +133,9 @@ Before creating the statement(s), articulate:
 **Report to orchestrator**:
 ```
 STATEMENT CREATED: Problem [ID] → Statement [statement ID]
-Claim: [the statement to be proved]
-Purpose: [how this resolves the problem once proved]
-Status: Statement awaiting proof by agent-prove
+Claim: [the statement to be evaluated]
+Purpose: [how this resolves the problem once established]
+Status: Statement awaiting proof/disproof by agent-prove
 ```
 
 The orchestrator will schedule agent-prove for the statement.

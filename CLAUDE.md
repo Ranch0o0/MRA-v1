@@ -77,34 +77,37 @@ Call agent-solve to work on problem [p-XXX]
 ---
 
 ## agent-prove
-**Purpose**: Works on statements. Either proves them directly or decomposes into sub-statements.
+**Purpose**: Works on statements. Either proves/disproves them directly or decomposes into sub-statements.
 
 **When to call**:
 - A statement has `status == "pending"`
-- A statement needs proof
+- A statement needs proof or disproof
 
 **Possible outcomes**:
 - `PROOF SUBMITTED` — Proof written, awaiting verification
+- `DISPROOF SUBMITTED` — Disproof written, awaiting verification
 - `DECOMPOSED` — Created sub-statement(s)
-- `FALSE` — Statement is unprovable (counterexample found)
+- `FALSE` — Statement marked as false (counterexample found)
 - `MODIFICATION PROPOSED` — Statement needs revision
-- `UNCERTAIN` — Unable to complete proof
+- `UNCERTAIN` — Unable to complete proof/disproof
 
 **Dispatch command**:
 ```
-Call agent-prove to prove statement [s-XXX]
+Call agent-prove to work on statement [s-XXX]
 ```
 
 ---
 
 ## agent-check
-**Purpose**: Verifies proofs. Confirms validity or identifies the first gap.
+**Purpose**: Verifies proofs and disproofs. Confirms validity or identifies the first gap.
 
 **When to call**:
 - A statement has `status == "validating"` and needs verification
 
 **Possible outcomes**:
 - `VERIFIED` — Proof is valid, statement marked as `true`
+- `DISPROOF VERIFIED` — Disproof is valid, statement marked as `false`
+- `DISPROOF VERIFIED BUT MODIFICATION SUGGESTED` — Disproof valid, but suggests fix
 - `REJECTED` — Gap found at sentence N
 
 **Dispatch command**:
@@ -203,11 +206,15 @@ Continue the loop until `p-001` has `status == "resolved"`.
 
 ## After agent-solve creates a statement
 1. Call agent-prove on the new statement
-2. After proof, call agent-check to verify
+2. After proof/disproof, call agent-check to verify
 
 ## After agent-prove decomposes
 1. Work on each sub-statement in order
-2. Once all sub-statements are `true`, parent can be completed
+2. Once all sub-statements are resolved (true or false), parent can be completed
+
+## After agent-check verifies a disproof with modification suggestion
+1. Call agent-fix to handle the modification request
+2. Agent-fix will either apply modification or mark statement as false
 
 ## When agent reports FALSE or MODIFICATION
 1. This requires human decision
